@@ -1,6 +1,13 @@
 <?php
 require __DIR__ . '/config/db.php';
 
+$mysqli = isset($mysqli) ? $mysqli : (isset($conn) ? $conn : null);
+if (!$mysqli instanceof mysqli) {
+  http_response_code(500);
+  echo 'DB not initialized';
+  exit;
+}
+
 function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
 $rack = trim($_GET['rack'] ?? '');
@@ -9,12 +16,6 @@ $assetId = (int)($_GET['id'] ?? 0);
 if ($rack === '') {
   http_response_code(400);
   echo 'rack parameter required';
-  exit;
-}
-
-if (!$mysqli instanceof mysqli) {
-  http_response_code(500);
-  echo 'DB not initialized';
   exit;
 }
 
