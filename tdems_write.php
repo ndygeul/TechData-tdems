@@ -27,8 +27,8 @@ $csrf = csrf_token();
       <!-- 1행: 설비바코드 | 랙 위치 | 장착 위치 | 호스트명 | IP -->
       <div class="form-grid grid-5">
         <div class="field">
-          <label class="label">설비바코드 <span class="req">*</span></label>
-          <input class="input" type="text" name="equip_barcode" required>
+          <label class="label">설비바코드</label>
+          <input class="input" type="text" name="equip_barcode">
         </div>
 
         <div class="field">

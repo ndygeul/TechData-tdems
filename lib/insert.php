@@ -37,23 +37,24 @@ $facility_status  = trim($_POST['facility_status'] ?? '');
 $asset_history    = trim($_POST['asset_history'] ?? '');
 $created_ip       = $_SERVER['REMOTE_ADDR'] ?? '';
 
-if ($equip_barcode === '') {
-  header('Location: ../tdems_write.php?msg=' . urlencode('설비바코드는 필수입니다.'));
-  exit;
-}
+if ($equip_barcode === '') { $equip_barcode = null; }
+if ($hostname === '') { $hostname = null; }
+if ($ip === '') { $ip = null; }
 // IPv4 검증 (빈 값 허용)
-if ($ip !== '' && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
+if ($ip !== null && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
   header('Location: ../tdems_write.php?msg=' . urlencode('IP 형식이 올바르지 않습니다(IPv4만 허용).'));
   exit;
 }
 
-// 중복 체크
-$chk = $__db->prepare("SELECT 1 FROM asset WHERE equip_barcode = ? LIMIT 1");
-if (!$chk) { header('Location: ../tdems_write.php?msg=' . urlencode('DB 오류(중복확인): '.$__db->error)); exit; }
-$chk->bind_param('s', $equip_barcode);
-$chk->execute(); $chk->store_result();
-if ($chk->num_rows > 0) { $chk->close(); header('Location: ../tdems_write.php?msg=' . urlencode('중복된 설비바코드입니다.')); exit; }
-$chk->close();
+// 중복 체크 (설비바코드가 있을 때만)
+if ($equip_barcode !== null) {
+  $chk = $__db->prepare("SELECT 1 FROM asset WHERE equip_barcode = ? LIMIT 1");
+  if (!$chk) { header('Location: ../tdems_write.php?msg=' . urlencode('DB 오류(중복확인): '.$__db->error)); exit; }
+  $chk->bind_param('s', $equip_barcode);
+  $chk->execute(); $chk->store_result();
+  if ($chk->num_rows > 0) { $chk->close(); header('Location: ../tdems_write.php?msg=' . urlencode('중복된 설비바코드입니다.')); exit; }
+  $chk->close();
+}
 
 // INSERT
 $sql = "INSERT INTO asset
@@ -79,63 +80,66 @@ if (!$stmt->execute()) {
 }
 $stmt->close();
 
-// MEMORY 정보 저장
-$mem_caps = $_POST['mem_capacity'] ?? [];
-$mem_qtys = $_POST['mem_qty'] ?? [];
-if (is_array($mem_caps) && is_array($mem_qtys)) {
-  $sql2 = "INSERT INTO asset_memory (equip_barcode, capacity, quantity) VALUES (?,?,?)";
-  $stmt2 = $__db->prepare($sql2);
-  if ($stmt2) {
-    $cap = $qty = null;
-    $stmt2->bind_param('ssi', $equip_barcode, $cap, $qty);
-    $cnt = min(count($mem_caps), count($mem_qtys));
-    for ($i = 0; $i < $cnt; $i++) {
-      $cap = trim($mem_caps[$i]);
-      $qty = (int)$mem_qtys[$i];
-      if ($cap === '' || $qty <= 0) continue;
-      $stmt2->execute();
+// MEMORY/SSD/HDD 정보 저장 (설비바코드가 있는 경우만)
+if ($equip_barcode !== null) {
+  // MEMORY
+  $mem_caps = $_POST['mem_capacity'] ?? [];
+  $mem_qtys = $_POST['mem_qty'] ?? [];
+  if (is_array($mem_caps) && is_array($mem_qtys)) {
+    $sql2 = "INSERT INTO asset_memory (equip_barcode, capacity, quantity) VALUES (?,?,?)";
+    $stmt2 = $__db->prepare($sql2);
+    if ($stmt2) {
+      $cap = $qty = null;
+      $stmt2->bind_param('ssi', $equip_barcode, $cap, $qty);
+      $cnt = min(count($mem_caps), count($mem_qtys));
+      for ($i = 0; $i < $cnt; $i++) {
+        $cap = trim($mem_caps[$i]);
+        $qty = (int)$mem_qtys[$i];
+        if ($cap === '' || $qty <= 0) continue;
+        $stmt2->execute();
+      }
+      $stmt2->close();
     }
-    $stmt2->close();
   }
-}
 
-// SSD 정보 저장
-$ssd_caps = $_POST['ssd_capacity'] ?? [];
-$ssd_qtys = $_POST['ssd_qty'] ?? [];
-if (is_array($ssd_caps) && is_array($ssd_qtys)) {
-  $sql2 = "INSERT INTO asset_ssd (equip_barcode, capacity, quantity) VALUES (?,?,?)";
-  $stmt2 = $__db->prepare($sql2);
-  if ($stmt2) {
-    $cap = $qty = null;
-    $stmt2->bind_param('ssi', $equip_barcode, $cap, $qty);
-    $cnt = min(count($ssd_caps), count($ssd_qtys));
-    for ($i = 0; $i < $cnt; $i++) {
-      $cap = trim($ssd_caps[$i]);
-      $qty = (int)$ssd_qtys[$i];
-      if ($cap === '' || $qty <= 0) continue;
-      $stmt2->execute();
+  // SSD
+  $ssd_caps = $_POST['ssd_capacity'] ?? [];
+  $ssd_qtys = $_POST['ssd_qty'] ?? [];
+  if (is_array($ssd_caps) && is_array($ssd_qtys)) {
+    $sql2 = "INSERT INTO asset_ssd (equip_barcode, capacity, quantity) VALUES (?,?,?)";
+    $stmt2 = $__db->prepare($sql2);
+    if ($stmt2) {
+      $cap = $qty = null;
+      $stmt2->bind_param('ssi', $equip_barcode, $cap, $qty);
+      $cnt = min(count($ssd_caps), count($ssd_qtys));
+      for ($i = 0; $i < $cnt; $i++) {
+        $cap = trim($ssd_caps[$i]);
+        $qty = (int)$ssd_qtys[$i];
+        if ($cap === '' || $qty <= 0) continue;
+        $stmt2->execute();
+      }
+      $stmt2->close();
     }
-    $stmt2->close();
   }
-}
 
-// HDD 정보 저장
-$hdd_caps = $_POST['hdd_capacity'] ?? [];
-$hdd_qtys = $_POST['hdd_qty'] ?? [];
-if (is_array($hdd_caps) && is_array($hdd_qtys)) {
-  $sql2 = "INSERT INTO asset_hdd (equip_barcode, capacity, quantity) VALUES (?,?,?)";
-  $stmt2 = $__db->prepare($sql2);
-  if ($stmt2) {
-    $cap = $qty = null;
-    $stmt2->bind_param('ssi', $equip_barcode, $cap, $qty);
-    $cnt = min(count($hdd_caps), count($hdd_qtys));
-    for ($i = 0; $i < $cnt; $i++) {
-      $cap = trim($hdd_caps[$i]);
-      $qty = (int)$hdd_qtys[$i];
-      if ($cap === '' || $qty <= 0) continue;
-      $stmt2->execute();
+  // HDD
+  $hdd_caps = $_POST['hdd_capacity'] ?? [];
+  $hdd_qtys = $_POST['hdd_qty'] ?? [];
+  if (is_array($hdd_caps) && is_array($hdd_qtys)) {
+    $sql2 = "INSERT INTO asset_hdd (equip_barcode, capacity, quantity) VALUES (?,?,?)";
+    $stmt2 = $__db->prepare($sql2);
+    if ($stmt2) {
+      $cap = $qty = null;
+      $stmt2->bind_param('ssi', $equip_barcode, $cap, $qty);
+      $cnt = min(count($hdd_caps), count($hdd_qtys));
+      for ($i = 0; $i < $cnt; $i++) {
+        $cap = trim($hdd_caps[$i]);
+        $qty = (int)$hdd_qtys[$i];
+        if ($cap === '' || $qty <= 0) continue;
+        $stmt2->execute();
+      }
+      $stmt2->close();
     }
-    $stmt2->close();
   }
 }
 

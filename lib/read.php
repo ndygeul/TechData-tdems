@@ -97,9 +97,8 @@ if ($asset_id > 0) {
 }
 
 $asset_mems = $asset_ssds = $asset_hdds = [];
-if ($asset && isset($asset['equip_barcode'])) {
-    $barcode = $asset['equip_barcode'];
-
+$barcode = $asset['equip_barcode'] ?? null;
+if ($asset && $barcode !== null && $barcode !== '') {
     // MEMORY
     $sql = "SELECT id, capacity, quantity FROM asset_memory WHERE equip_barcode = ? ORDER BY id";
     $stmt = $__db->prepare($sql);
