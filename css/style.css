@@ -267,6 +267,10 @@ code.mono {
 hr.divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, var(--muted-border), transparent); margin: 12px 0; }
 
 /* ===== Rack View ===== */
+.rack-table {
+  width: 100%;
+  table-layout: fixed;
+}
 .rack-table tbody th {
   border-top: 1px solid #1e3a5f;
   padding: 10px;
@@ -276,7 +280,11 @@ hr.divider { border: none; height: 1px; background: linear-gradient(90deg, trans
   text-align: center;
 }
 .rack-table tbody td {
+  width: 200px;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .rack-selected td {
   background: rgba(22,163,255,0.15);
@@ -290,4 +298,18 @@ hr.divider { border: none; height: 1px; background: linear-gradient(90deg, trans
 
 .rack-list .card {
   flex: 0 0 auto;
+  width: 262px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.rack-list .card h2 {
+  margin: 0;
+  padding: 8px 0;
+  text-align: center;
+}
+
+.rack-gap {
+  flex: 0 0 auto;
+  width: 262px;
 }
