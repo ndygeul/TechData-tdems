@@ -100,6 +100,66 @@ $res = $stmt->get_result();
 $rows = $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
 $stmt->close();
 
+// Calculate column widths based on header and content length
+$headers = [
+    '설비바코드', '랙/장착', '호스트명', 'IP', '종류', '제조사', '모델명', 'S/N',
+    '입고년월', 'OS', 'CPU종류', 'CPU수량', 'CPU코어', 'SWAP', 'MEMORY', 'SSD',
+    'HDD', 'MA', '상태', '설비상태', '용도', '상세용도', '자산보유팀', '표준서비스',
+    '단위서비스', '자산 이력'
+];
+
+$valueFuncs = [
+    fn($r) => $r['equip_barcode'] ?? '',
+    fn($r) => trim(($r['rack_location'] ?? '') . ' ' . ($r['mounted_location'] ?? '')),
+    fn($r) => $r['hostname'] ?? '',
+    fn($r) => $r['ip'] ?? '',
+    fn($r) => $r['asset_type'] ?? '',
+    fn($r) => $r['manufacturer'] ?? '',
+    fn($r) => $r['model_name'] ?? '',
+    fn($r) => $r['serial_number'] ?? '',
+    fn($r) => format_receipt_ym($r['receipt_ym'] ?? ''),
+    fn($r) => $r['os'] ?? '',
+    fn($r) => $r['cpu_type'] ?? '',
+    fn($r) => $r['cpu_qty'] ?? '',
+    fn($r) => $r['cpu_core'] ?? '',
+    fn($r) => $r['swap_size'] ?? '',
+    fn($r) => $r['mem_list'] ?? '',
+    fn($r) => $r['ssd_list'] ?? '',
+    fn($r) => $r['hdd_list'] ?? '',
+    fn($r) => $r['ma'] ?? '',
+    fn($r) => $r['status'] ?? '',
+    fn($r) => $r['facility_status'] ?? '',
+    fn($r) => $r['purpose'] ?? '',
+    fn($r) => $r['purpose_detail'] ?? '',
+    fn($r) => $r['own_team'] ?? '',
+    fn($r) => $r['standard_service'] ?? '',
+    fn($r) => $r['unit_service'] ?? '',
+    fn($r) => $r['asset_history'] ?? ''
+];
+
+$calcWidth = function ($text) {
+    $lines = preg_split('/\r\n|\r|\n/', (string)$text);
+    $max = 0;
+    foreach ($lines as $line) {
+        $len = mb_strlen($line, 'UTF-8');
+        if ($len > $max) { $max = $len; }
+    }
+    return $max;
+};
+
+$colWidths = [];
+foreach ($headers as $i => $h) {
+    $colWidths[$i] = mb_strlen($h, 'UTF-8');
+}
+
+foreach ($rows as $r) {
+    foreach ($valueFuncs as $i => $fn) {
+        $colWidths[$i] = max($colWidths[$i], $calcWidth($fn($r)));
+    }
+}
+
+$colWidths = array_map(fn($len) => ($len + 2) * 8, $colWidths);
+
 date_default_timezone_set('Asia/Seoul');
 $filename = 'asset_list_' . date('Ymd_His') . '.xls';
 header('Content-Type: application/vnd.ms-excel; charset=UTF-8');
@@ -108,6 +168,11 @@ echo "\xEF\xBB\xBF"; // UTF-8 BOM
 ?>
 <meta charset="UTF-8">
 <table border="1">
+  <colgroup>
+  <?php foreach ($colWidths as $w): ?>
+    <col style="width: <?= $w ?>px">
+  <?php endforeach; ?>
+  </colgroup>
   <tr>
     <th>설비바코드</th>
     <th>랙/장착</th>
