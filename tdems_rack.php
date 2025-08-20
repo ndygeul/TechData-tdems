@@ -72,6 +72,25 @@ while ($row = $res->fetch_assoc()) {
 }
 $stmt->close();
 
+// Ensure racks are displayed with gaps for missing numbers
+$numbers = [];
+foreach (array_keys($rackAssets) as $name) {
+  if (preg_match('/^' . preg_quote($prefix, '/') . '(\d+)/i', $name, $m)) {
+    $numbers[] = (int)$m[1];
+  }
+}
+sort($numbers);
+$ordered = [];
+if ($numbers) {
+  $min = min($numbers);
+  $max = max($numbers);
+  for ($i = $min; $i <= $max; $i++) {
+    $name = $prefix . sprintf('%02d', $i);
+    $ordered[$name] = $rackAssets[$name] ?? [];
+  }
+}
+$rackAssets = $ordered;
+
 ?>
 <!DOCTYPE html>
 <html lang="ko">
