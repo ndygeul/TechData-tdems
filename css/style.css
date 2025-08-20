@@ -267,49 +267,40 @@ code.mono {
 hr.divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, var(--muted-border), transparent); margin: 12px 0; }
 
 /* ===== Rack View ===== */
-.rack-table {
-  width: 100%;
-  table-layout: fixed;
-}
-.rack-table tbody th {
-  border-top: 1px solid #1e3a5f;
-  padding: 10px;
-  color: var(--text);
-  background: #0b1d36;
-  width: 60px;
-  text-align: center;
-}
-.rack-table tbody td {
-  width: 200px;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.rack-selected td {
-  background: rgba(22,163,255,0.15);
-}
-
 .rack-list {
   display: flex;
   gap: 16px;
   overflow-x: auto;
 }
 
-.rack-list .card {
+.rack-table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 200px;
   flex: 0 0 auto;
-  width: 262px;
-  padding: 0;
-  overflow: hidden;
 }
 
-.rack-list .card h2 {
-  margin: 0;
-  padding: 8px 0;
+.rack-table thead th {
+  background: #ffeb3b;
+  color: #000;
+  border: 1px solid #1e3a5f;
+  padding: 4px 0;
   text-align: center;
 }
 
+.rack-table tbody td {
+  border: 1px solid #1e3a5f;
+  height: 24px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rack-selected td {
+  background: rgba(22,163,255,0.15);
+}
+
 .rack-gap {
-  flex: 0 0 auto;
-  width: 262px;
+  flex: 0 0 200px;
 }

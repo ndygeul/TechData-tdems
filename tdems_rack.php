@@ -72,6 +72,25 @@ while ($row = $res->fetch_assoc()) {
 }
 $stmt->close();
 
+// Ensure racks are displayed with gaps for missing numbers
+$numbers = [];
+foreach (array_keys($rackAssets) as $name) {
+  if (preg_match('/^' . preg_quote($prefix, '/') . '(\d+)/i', $name, $m)) {
+    $numbers[] = (int)$m[1];
+  }
+}
+sort($numbers);
+$ordered = [];
+if ($numbers) {
+  $min = min($numbers);
+  $max = max($numbers);
+  for ($i = $min; $i <= $max; $i++) {
+    $name = $prefix . sprintf('%02d', $i);
+    $ordered[$name] = $rackAssets[$name] ?? [];
+  }
+}
+$rackAssets = $ordered;
+
 ?>
 <!DOCTYPE html>
 <html lang="ko">
@@ -92,30 +111,31 @@ $stmt->close();
   <main class="container narrow">
     <div class="rack-list">
       <?php foreach ($rackAssets as $rackName => $assets): ?>
-        <section class="card">
-          <h2 style="text-align:center;margin-top:0;"><?= h($rackName) ?></h2>
-          <table class="table rack-table">
-            <tbody>
-              <?php for ($u = 42; $u >= 1; $u--): ?>
-                <?php if (array_key_exists($u, $assets) && $assets[$u] === false): ?>
-                  <tr>
-                    <th><?= sprintf('%02d', $u) ?>U</th>
-                  </tr>
-                  <?php continue; ?>
+        <?php if (empty($assets)): ?>
+          <div class="rack-gap"></div>
+          <?php continue; ?>
+        <?php endif; ?>
+        <table class="rack-table">
+          <thead>
+            <tr><th><?= h($rackName) ?></th></tr>
+          </thead>
+          <tbody>
+            <?php for ($u = 42; $u >= 1; $u--): ?>
+              <?php if (array_key_exists($u, $assets) && $assets[$u] === false): ?>
+                <tr></tr>
+                <?php continue; ?>
+              <?php endif; ?>
+              <?php $row = $assets[$u] ?? null; ?>
+              <tr class="<?= ($row && $row['asset_id'] == $assetId) ? 'rack-selected' : '' ?>">
+                <?php if ($row): ?>
+                  <td rowspan="<?= $row['rowspan'] ?>"><?= h($row['hostname']) ?></td>
+                <?php else: ?>
+                  <td><?= sprintf('%02d', $u) ?>U</td>
                 <?php endif; ?>
-                <?php $row = $assets[$u] ?? null; ?>
-                <tr class="<?= ($row && $row['asset_id'] == $assetId) ? 'rack-selected' : '' ?>">
-                  <th><?= sprintf('%02d', $u) ?>U</th>
-                  <?php if ($row): ?>
-                    <td rowspan="<?= $row['rowspan'] ?>"><?= h($row['hostname']) ?></td>
-                  <?php else: ?>
-                    <td></td>
-                  <?php endif; ?>
-                </tr>
-              <?php endfor; ?>
-            </tbody>
-          </table>
-        </section>
+              </tr>
+            <?php endfor; ?>
+          </tbody>
+        </table>
       <?php endforeach; ?>
     </div>
   </main>
