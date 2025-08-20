@@ -25,9 +25,23 @@ $stmt->execute();
 $res = $stmt->get_result();
 $assets = [];
 while ($row = $res->fetch_assoc()) {
-  if (preg_match('/(\d+)/', $row['mounted_location'] ?? '', $m)) {
-    $u = (int)$m[1];
-    $assets[$u] = $row;
+  $loc = strtoupper(trim($row['mounted_location'] ?? ''));
+  if ($loc === 'ALL') {
+    $bottom = 1;
+    $top = 42;
+  } elseif (preg_match('/^(\d{2})(?:-(\d{2}))?$/', $loc, $m)) {
+    $start = (int)$m[1];
+    $end = isset($m[2]) ? (int)$m[2] : $start;
+    $bottom = min($start, $end);
+    $top = max($start, $end);
+  } else {
+    continue;
+  }
+
+  $row['rowspan'] = $top - $bottom + 1;
+  $assets[$top] = $row;
+  for ($u = $bottom; $u < $top; $u++) {
+    $assets[$u] = false;
   }
 }
 $stmt->close();
@@ -55,19 +69,20 @@ $stmt->close();
       <table class="table rack-table">
         <tbody>
           <?php for ($u = 42; $u >= 1; $u--): ?>
+            <?php if (array_key_exists($u, $assets) && $assets[$u] === false): ?>
+              <tr>
+                <th><?= $u ?>U</th>
+              </tr>
+              <?php continue; ?>
+            <?php endif; ?>
             <?php $row = $assets[$u] ?? null; ?>
             <tr class="<?= ($row && $row['asset_id'] == $assetId) ? 'rack-selected' : '' ?>">
               <th><?= $u ?>U</th>
-              <td>
-                <?php if ($row): ?>
-                  <?= h($row['hostname']) ?>
-                  <?php if ($row['asset_id'] == $assetId): ?>
-                    // 선택 장비
-                  <?php else: ?>
-                    // 동일한 랙에 장착된 장비
-                  <?php endif; ?>
-                <?php endif; ?>
-              </td>
+              <?php if ($row): ?>
+                <td rowspan="<?= $row['rowspan'] ?>"><?= h($row['hostname']) ?></td>
+              <?php else: ?>
+                <td></td>
+              <?php endif; ?>
             </tr>
           <?php endfor; ?>
         </tbody>
