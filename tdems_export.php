@@ -138,7 +138,7 @@ echo "\xEF\xBB\xBF"; // UTF-8 BOM
   </tr>
 <?php foreach ($rows as $r): ?>
   <tr>
-    <td><?= h($r['equip_barcode'] ?? '') ?></td>
+    <td style="mso-number-format:'\@';"><?= h($r['equip_barcode'] ?? '') ?></td>
     <td><?= h(trim(($r['rack_location'] ?? '') . ' ' . ($r['mounted_location'] ?? ''))) ?></td>
     <td><?= h($r['hostname'] ?? '') ?></td>
     <td><?= h($r['ip'] ?? '') ?></td>
