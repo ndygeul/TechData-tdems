@@ -276,11 +276,11 @@ hr.divider { border: none; height: 1px; background: linear-gradient(90deg, trans
   padding: 10px;
   color: var(--text);
   background: #0b1d36;
-  width: 60px;
+  width: 38px;
   text-align: center;
 }
 .rack-table tbody td {
-  width: 200px;
+  width: 100px;
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
@@ -288,10 +288,6 @@ hr.divider { border: none; height: 1px; background: linear-gradient(90deg, trans
 }
 .rack-selected td {
   background: rgba(22,163,255,0.15);
-}
-
-.rack-scroll {
-  position: relative;
 }
 
 .rack-list {
@@ -303,9 +299,10 @@ hr.divider { border: none; height: 1px; background: linear-gradient(90deg, trans
 }
 
 .rack-nav {
-  position: absolute;
+  position: fixed;
   top: 50%;
   transform: translateY(-50%);
+  z-index: 20;
 }
 
 .rack-nav.prev { left: 0; }
@@ -313,7 +310,7 @@ hr.divider { border: none; height: 1px; background: linear-gradient(90deg, trans
 
 .rack-list .card {
   flex: 0 0 auto;
-  width: 262px;
+  width: 140px;
   padding: 0;
   overflow: hidden;
 }
@@ -326,5 +323,5 @@ hr.divider { border: none; height: 1px; background: linear-gradient(90deg, trans
 
 .rack-gap {
   flex: 0 0 auto;
-  width: 262px;
+  width: 140px;
 }
