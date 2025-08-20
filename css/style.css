@@ -313,3 +313,25 @@ hr.divider { border: none; height: 1px; background: linear-gradient(90deg, trans
   flex: 0 0 auto;
   width: 140px;
 }
+
+/* Tooltip for rack assets */
+.rack-table td[data-tooltip] {
+  position: relative;
+}
+
+.rack-table td[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translate(8px, -50%);
+  background: var(--panel-3);
+  color: var(--text);
+  border: 1px solid var(--muted-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  white-space: pre-line;
+  box-shadow: var(--shadow-soft);
+  z-index: 20;
+  max-width: 240px;
+}
