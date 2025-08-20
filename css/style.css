@@ -281,3 +281,13 @@ hr.divider { border: none; height: 1px; background: linear-gradient(90deg, trans
 .rack-selected td {
   background: rgba(22,163,255,0.15);
 }
+
+.rack-list {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+}
+
+.rack-list .card {
+  flex: 0 0 auto;
+}

@@ -19,30 +19,56 @@ if ($rack === '') {
   exit;
 }
 
-$stmt = $mysqli->prepare('SELECT asset_id, hostname, mounted_location FROM asset WHERE rack_location = ? AND del_yn = "N"');
-$stmt->bind_param('s', $rack);
+/**
+ * Build an array of rack units and placed assets for a given rack.
+ * Returns an associative array keyed by rack unit number (top unit index).
+ */
+function loadRackAssets(mysqli $mysqli, string $rack): array {
+  $stmt = $mysqli->prepare('SELECT asset_id, hostname, mounted_location FROM asset WHERE rack_location = ? AND del_yn = "N"');
+  $stmt->bind_param('s', $rack);
+  $stmt->execute();
+  $res = $stmt->get_result();
+  $assets = [];
+  while ($row = $res->fetch_assoc()) {
+    $loc = strtoupper(trim($row['mounted_location'] ?? ''));
+    if ($loc === 'ALL') {
+      $bottom = 1;
+      $top = 42;
+    } elseif (preg_match('/^(\d{2})(?:-(\d{2}))?$/', $loc, $m)) {
+      $start = (int)$m[1];
+      $end = isset($m[2]) ? (int)$m[2] : $start;
+      $bottom = min($start, $end);
+      $top = max($start, $end);
+    } else {
+      continue;
+    }
+
+    $row['rowspan'] = $top - $bottom + 1;
+    $assets[$top] = $row;
+    for ($u = $bottom; $u < $top; $u++) {
+      $assets[$u] = false;
+    }
+  }
+  $stmt->close();
+  return $assets;
+}
+
+// Determine rack group prefix (letters at the start, e.g. AC from AC04).
+if (preg_match('/^([A-Za-z]+)/', $rack, $m)) {
+  $prefix = strtoupper($m[1]);
+} else {
+  $prefix = $rack;
+}
+
+$like = $prefix . '%';
+$stmt = $mysqli->prepare('SELECT DISTINCT rack_location FROM asset WHERE rack_location LIKE ? AND del_yn = "N" ORDER BY rack_location');
+$stmt->bind_param('s', $like);
 $stmt->execute();
 $res = $stmt->get_result();
-$assets = [];
+$rackAssets = [];
 while ($row = $res->fetch_assoc()) {
-  $loc = strtoupper(trim($row['mounted_location'] ?? ''));
-  if ($loc === 'ALL') {
-    $bottom = 1;
-    $top = 42;
-  } elseif (preg_match('/^(\d{2})(?:-(\d{2}))?$/', $loc, $m)) {
-    $start = (int)$m[1];
-    $end = isset($m[2]) ? (int)$m[2] : $start;
-    $bottom = min($start, $end);
-    $top = max($start, $end);
-  } else {
-    continue;
-  }
-
-  $row['rowspan'] = $top - $bottom + 1;
-  $assets[$top] = $row;
-  for ($u = $bottom; $u < $top; $u++) {
-    $assets[$u] = false;
-  }
+  $r = $row['rack_location'];
+  $rackAssets[$r] = loadRackAssets($mysqli, $r);
 }
 $stmt->close();
 
@@ -64,30 +90,34 @@ $stmt->close();
   </header>
 
   <main class="container narrow">
-    <section class="card">
-      <h2 style="text-align:center;margin-top:0;"><?= h($rack) ?></h2>
-      <table class="table rack-table">
-        <tbody>
-          <?php for ($u = 42; $u >= 1; $u--): ?>
-            <?php if (array_key_exists($u, $assets) && $assets[$u] === false): ?>
-              <tr>
-                <th><?= sprintf('%02d', $u) ?>U</th>
-              </tr>
-              <?php continue; ?>
-            <?php endif; ?>
-            <?php $row = $assets[$u] ?? null; ?>
-            <tr class="<?= ($row && $row['asset_id'] == $assetId) ? 'rack-selected' : '' ?>">
-              <th><?= sprintf('%02d', $u) ?>U</th>
-              <?php if ($row): ?>
-                <td rowspan="<?= $row['rowspan'] ?>"><?= h($row['hostname']) ?></td>
-              <?php else: ?>
-                <td></td>
-              <?php endif; ?>
-            </tr>
-          <?php endfor; ?>
-        </tbody>
-      </table>
-    </section>
+    <div class="rack-list">
+      <?php foreach ($rackAssets as $rackName => $assets): ?>
+        <section class="card">
+          <h2 style="text-align:center;margin-top:0;"><?= h($rackName) ?></h2>
+          <table class="table rack-table">
+            <tbody>
+              <?php for ($u = 42; $u >= 1; $u--): ?>
+                <?php if (array_key_exists($u, $assets) && $assets[$u] === false): ?>
+                  <tr>
+                    <th><?= sprintf('%02d', $u) ?>U</th>
+                  </tr>
+                  <?php continue; ?>
+                <?php endif; ?>
+                <?php $row = $assets[$u] ?? null; ?>
+                <tr class="<?= ($row && $row['asset_id'] == $assetId) ? 'rack-selected' : '' ?>">
+                  <th><?= sprintf('%02d', $u) ?>U</th>
+                  <?php if ($row): ?>
+                    <td rowspan="<?= $row['rowspan'] ?>"><?= h($row['hostname']) ?></td>
+                  <?php else: ?>
+                    <td></td>
+                  <?php endif; ?>
+                </tr>
+              <?php endfor; ?>
+            </tbody>
+          </table>
+        </section>
+      <?php endforeach; ?>
+    </div>
   </main>
 </body>
 </html>
