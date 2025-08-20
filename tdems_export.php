@@ -100,66 +100,6 @@ $res = $stmt->get_result();
 $rows = $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
 $stmt->close();
 
-// Calculate column widths based on header and content length
-$headers = [
-    '설비바코드', '랙/장착', '호스트명', 'IP', '종류', '제조사', '모델명', 'S/N',
-    '입고년월', 'OS', 'CPU종류', 'CPU수량', 'CPU코어', 'SWAP', 'MEMORY', 'SSD',
-    'HDD', 'MA', '상태', '설비상태', '용도', '상세용도', '자산보유팀', '표준서비스',
-    '단위서비스', '자산 이력'
-];
-
-$valueFuncs = [
-    function ($r) { return $r['equip_barcode'] ?? ''; },
-    function ($r) { return trim(($r['rack_location'] ?? '') . ' ' . ($r['mounted_location'] ?? '')); },
-    function ($r) { return $r['hostname'] ?? ''; },
-    function ($r) { return $r['ip'] ?? ''; },
-    function ($r) { return $r['asset_type'] ?? ''; },
-    function ($r) { return $r['manufacturer'] ?? ''; },
-    function ($r) { return $r['model_name'] ?? ''; },
-    function ($r) { return $r['serial_number'] ?? ''; },
-    function ($r) { return format_receipt_ym($r['receipt_ym'] ?? ''); },
-    function ($r) { return $r['os'] ?? ''; },
-    function ($r) { return $r['cpu_type'] ?? ''; },
-    function ($r) { return $r['cpu_qty'] ?? ''; },
-    function ($r) { return $r['cpu_core'] ?? ''; },
-    function ($r) { return $r['swap_size'] ?? ''; },
-    function ($r) { return $r['mem_list'] ?? ''; },
-    function ($r) { return $r['ssd_list'] ?? ''; },
-    function ($r) { return $r['hdd_list'] ?? ''; },
-    function ($r) { return $r['ma'] ?? ''; },
-    function ($r) { return $r['status'] ?? ''; },
-    function ($r) { return $r['facility_status'] ?? ''; },
-    function ($r) { return $r['purpose'] ?? ''; },
-    function ($r) { return $r['purpose_detail'] ?? ''; },
-    function ($r) { return $r['own_team'] ?? ''; },
-    function ($r) { return $r['standard_service'] ?? ''; },
-    function ($r) { return $r['unit_service'] ?? ''; },
-    function ($r) { return $r['asset_history'] ?? ''; }
-];
-
-$calcWidth = function ($text) {
-    $lines = preg_split('/\r\n|\r|\n/', (string)$text);
-    $max = 0;
-    foreach ($lines as $line) {
-        $len = mb_strlen($line, 'UTF-8');
-        if ($len > $max) { $max = $len; }
-    }
-    return $max;
-};
-
-$colWidths = [];
-foreach ($headers as $i => $h) {
-    $colWidths[$i] = mb_strlen($h, 'UTF-8');
-}
-
-foreach ($rows as $r) {
-    foreach ($valueFuncs as $i => $fn) {
-        $colWidths[$i] = max($colWidths[$i], $calcWidth($fn($r)));
-    }
-}
-
-$colWidths = array_map(function ($len) { return ($len + 2) * 8; }, $colWidths);
-
 date_default_timezone_set('Asia/Seoul');
 $filename = 'asset_list_' . date('Ymd_His') . '.xls';
 header('Content-Type: application/vnd.ms-excel; charset=UTF-8');
@@ -168,11 +108,6 @@ echo "\xEF\xBB\xBF"; // UTF-8 BOM
 ?>
 <meta charset="UTF-8">
 <table border="1">
-  <colgroup>
-  <?php foreach ($colWidths as $w): ?>
-    <col style="width: <?= $w ?>px">
-  <?php endforeach; ?>
-  </colgroup>
   <tr>
     <th>설비바코드</th>
     <th>랙/장착</th>
