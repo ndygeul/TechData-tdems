@@ -300,6 +300,25 @@
 
     // ---- IP 입력 검증 바인딩 ----
     $all('input[name="ip"]').forEach(bindIPv4Validation);
+
+    // ---- 랙 리스트 좌/우 이동 버튼 ----
+    const rackList = document.querySelector('.rack-list');
+    if (rackList) {
+      const prevBtn = document.querySelector('.rack-nav.prev');
+      const nextBtn = document.querySelector('.rack-nav.next');
+      const card = rackList.querySelector('.card');
+      const step = card ? card.offsetWidth + 16 : 160;
+      if (prevBtn) {
+        prevBtn.addEventListener('click', function () {
+          rackList.scrollBy({ left: -step, behavior: 'smooth' });
+        });
+      }
+      if (nextBtn) {
+        nextBtn.addEventListener('click', function () {
+          rackList.scrollBy({ left: step, behavior: 'smooth' });
+        });
+      }
+    }
   });
 })();
 

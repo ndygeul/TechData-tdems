@@ -290,11 +290,26 @@ hr.divider { border: none; height: 1px; background: linear-gradient(90deg, trans
   background: rgba(22,163,255,0.15);
 }
 
+.rack-scroll {
+  position: relative;
+}
+
 .rack-list {
   display: flex;
   gap: 16px;
   overflow-x: auto;
+  scroll-behavior: smooth;
+  margin: 0 40px;
 }
+
+.rack-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.rack-nav.prev { left: 0; }
+.rack-nav.next { right: 0; }
 
 .rack-list .card {
   flex: 0 0 auto;

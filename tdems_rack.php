@@ -164,6 +164,7 @@ $stmt->close();
   <title>랙 정보 - <?= h($rack) ?></title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/app.js" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -174,33 +175,37 @@ $stmt->close();
   </header>
 
   <main class="container narrow">
-    <div class="rack-list">
-      <?php foreach ($rackAssets as $rackName => $assets): ?>
-        <section class="card">
-          <h2 style="text-align:center;margin-top:0;"><?= h($rackName) ?></h2>
-          <table class="table rack-table">
-            <tbody>
-              <?php for ($u = 42; $u >= 1; $u--): ?>
-                <?php if (array_key_exists($u, $assets) && $assets[$u] === false): ?>
-                  <tr>
-                    <th><?= sprintf('%02d', $u) ?>U</th>
-                  </tr>
-                  <?php continue; ?>
-                <?php endif; ?>
-                <?php $row = $assets[$u] ?? null; ?>
-                <tr class="<?= ($row && $row['asset_id'] == $assetId) ? 'rack-selected' : '' ?>">
-                  <th><?= sprintf('%02d', $u) ?>U</th>
-                  <?php if ($row): ?>
-                    <td rowspan="<?= $row['rowspan'] ?>" title="<?= h($row['tooltip']) ?>"><?= h($row['hostname']) ?></td>
-                  <?php else: ?>
-                    <td></td>
+    <div class="rack-scroll">
+      <button type="button" class="btn rack-nav prev">&#9664;</button>
+      <div class="rack-list">
+        <?php foreach ($rackAssets as $rackName => $assets): ?>
+          <section class="card">
+            <h2 style="text-align:center;margin-top:0;"><?= h($rackName) ?></h2>
+            <table class="table rack-table">
+              <tbody>
+                <?php for ($u = 42; $u >= 1; $u--): ?>
+                  <?php if (array_key_exists($u, $assets) && $assets[$u] === false): ?>
+                    <tr>
+                      <th><?= sprintf('%02d', $u) ?>U</th>
+                    </tr>
+                    <?php continue; ?>
                   <?php endif; ?>
-                </tr>
-              <?php endfor; ?>
-            </tbody>
-          </table>
-        </section>
-      <?php endforeach; ?>
+                  <?php $row = $assets[$u] ?? null; ?>
+                  <tr class="<?= ($row && $row['asset_id'] == $assetId) ? 'rack-selected' : '' ?>">
+                    <th><?= sprintf('%02d', $u) ?>U</th>
+                    <?php if ($row): ?>
+                      <td rowspan="<?= $row['rowspan'] ?>" title="<?= h($row['tooltip']) ?>"><?= h($row['hostname']) ?></td>
+                    <?php else: ?>
+                      <td></td>
+                    <?php endif; ?>
+                  </tr>
+                <?php endfor; ?>
+              </tbody>
+            </table>
+          </section>
+        <?php endforeach; ?>
+      </div>
+      <button type="button" class="btn rack-nav next">&#9654;</button>
     </div>
   </main>
 </body>
