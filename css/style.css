@@ -268,7 +268,7 @@ hr.divider { border: none; height: 1px; background: linear-gradient(90deg, trans
 
 /* ===== Rack View ===== */
 .rack-table {
-  width: 260px;
+  width: 100%;
   table-layout: fixed;
 }
 .rack-table tbody th {
@@ -298,5 +298,18 @@ hr.divider { border: none; height: 1px; background: linear-gradient(90deg, trans
 
 .rack-list .card {
   flex: 0 0 auto;
-  width: 260px;
+  width: 262px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.rack-list .card h2 {
+  margin: 0;
+  padding: 8px 0;
+  text-align: center;
+}
+
+.rack-gap {
+  flex: 0 0 auto;
+  width: 262px;
 }

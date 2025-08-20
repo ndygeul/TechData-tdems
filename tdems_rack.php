@@ -111,8 +111,12 @@ $rackAssets = $ordered;
   <main class="container narrow">
     <div class="rack-list">
       <?php foreach ($rackAssets as $rackName => $assets): ?>
+        <?php if (empty($assets)): ?>
+          <div class="rack-gap"></div>
+          <?php continue; ?>
+        <?php endif; ?>
         <section class="card">
-          <h2 style="text-align:center;margin-top:0;"><?= h($rackName) ?></h2>
+          <h2><?= h($rackName) ?></h2>
           <table class="table rack-table">
             <tbody>
               <?php for ($u = 42; $u >= 1; $u--): ?>
