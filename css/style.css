@@ -30,6 +30,7 @@
 /* ===== Reset & Base ===== */
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; height: 100%; }
+html.no-x-scroll, body.no-x-scroll { overflow-x: hidden; }
 body {
   font-family: var(--font);
   font-size: 14px;

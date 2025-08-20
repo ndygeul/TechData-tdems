@@ -158,7 +158,7 @@ $stmt->close();
 
 ?>
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" class="no-x-scroll">
 <head>
   <meta charset="UTF-8">
   <title>랙 정보 - <?= h($rack) ?></title>
@@ -166,7 +166,7 @@ $stmt->close();
   <link rel="stylesheet" href="css/style.css">
   <script src="js/app.js" defer></script>
 </head>
-<body>
+<body class="no-x-scroll">
   <header class="topbar">
     <h1 class="title">랙/장착 정보</h1>
     <nav class="actions">
