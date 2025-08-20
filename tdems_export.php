@@ -109,32 +109,32 @@ $headers = [
 ];
 
 $valueFuncs = [
-    fn($r) => $r['equip_barcode'] ?? '',
-    fn($r) => trim(($r['rack_location'] ?? '') . ' ' . ($r['mounted_location'] ?? '')),
-    fn($r) => $r['hostname'] ?? '',
-    fn($r) => $r['ip'] ?? '',
-    fn($r) => $r['asset_type'] ?? '',
-    fn($r) => $r['manufacturer'] ?? '',
-    fn($r) => $r['model_name'] ?? '',
-    fn($r) => $r['serial_number'] ?? '',
-    fn($r) => format_receipt_ym($r['receipt_ym'] ?? ''),
-    fn($r) => $r['os'] ?? '',
-    fn($r) => $r['cpu_type'] ?? '',
-    fn($r) => $r['cpu_qty'] ?? '',
-    fn($r) => $r['cpu_core'] ?? '',
-    fn($r) => $r['swap_size'] ?? '',
-    fn($r) => $r['mem_list'] ?? '',
-    fn($r) => $r['ssd_list'] ?? '',
-    fn($r) => $r['hdd_list'] ?? '',
-    fn($r) => $r['ma'] ?? '',
-    fn($r) => $r['status'] ?? '',
-    fn($r) => $r['facility_status'] ?? '',
-    fn($r) => $r['purpose'] ?? '',
-    fn($r) => $r['purpose_detail'] ?? '',
-    fn($r) => $r['own_team'] ?? '',
-    fn($r) => $r['standard_service'] ?? '',
-    fn($r) => $r['unit_service'] ?? '',
-    fn($r) => $r['asset_history'] ?? ''
+    function ($r) { return $r['equip_barcode'] ?? ''; },
+    function ($r) { return trim(($r['rack_location'] ?? '') . ' ' . ($r['mounted_location'] ?? '')); },
+    function ($r) { return $r['hostname'] ?? ''; },
+    function ($r) { return $r['ip'] ?? ''; },
+    function ($r) { return $r['asset_type'] ?? ''; },
+    function ($r) { return $r['manufacturer'] ?? ''; },
+    function ($r) { return $r['model_name'] ?? ''; },
+    function ($r) { return $r['serial_number'] ?? ''; },
+    function ($r) { return format_receipt_ym($r['receipt_ym'] ?? ''); },
+    function ($r) { return $r['os'] ?? ''; },
+    function ($r) { return $r['cpu_type'] ?? ''; },
+    function ($r) { return $r['cpu_qty'] ?? ''; },
+    function ($r) { return $r['cpu_core'] ?? ''; },
+    function ($r) { return $r['swap_size'] ?? ''; },
+    function ($r) { return $r['mem_list'] ?? ''; },
+    function ($r) { return $r['ssd_list'] ?? ''; },
+    function ($r) { return $r['hdd_list'] ?? ''; },
+    function ($r) { return $r['ma'] ?? ''; },
+    function ($r) { return $r['status'] ?? ''; },
+    function ($r) { return $r['facility_status'] ?? ''; },
+    function ($r) { return $r['purpose'] ?? ''; },
+    function ($r) { return $r['purpose_detail'] ?? ''; },
+    function ($r) { return $r['own_team'] ?? ''; },
+    function ($r) { return $r['standard_service'] ?? ''; },
+    function ($r) { return $r['unit_service'] ?? ''; },
+    function ($r) { return $r['asset_history'] ?? ''; }
 ];
 
 $calcWidth = function ($text) {
@@ -158,7 +158,7 @@ foreach ($rows as $r) {
     }
 }
 
-$colWidths = array_map(fn($len) => ($len + 2) * 8, $colWidths);
+$colWidths = array_map(function ($len) { return ($len + 2) * 8; }, $colWidths);
 
 date_default_timezone_set('Asia/Seoul');
 $filename = 'asset_list_' . date('Ymd_His') . '.xls';
