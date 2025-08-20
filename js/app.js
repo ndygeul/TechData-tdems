@@ -308,16 +308,25 @@
       const nextBtn = document.querySelector('.rack-nav.next');
       const card = rackList.querySelector('.card');
       const step = card ? card.offsetWidth + 16 : 160;
-      if (prevBtn) {
-        prevBtn.addEventListener('click', function () {
-          rackList.scrollBy({ left: -step, behavior: 'smooth' });
+
+      function setupNav(btn, dir) {
+        if (!btn) return;
+        let timer;
+        const scroll = () => rackList.scrollBy({ left: dir * step, behavior: 'smooth' });
+        const start = () => {
+          scroll();
+          timer = setInterval(scroll, 200);
+        };
+        const stop = () => clearInterval(timer);
+        btn.addEventListener('mousedown', start);
+        btn.addEventListener('touchstart', start);
+        ['mouseup', 'mouseleave', 'touchend', 'touchcancel'].forEach(ev => {
+          btn.addEventListener(ev, stop);
         });
       }
-      if (nextBtn) {
-        nextBtn.addEventListener('click', function () {
-          rackList.scrollBy({ left: step, behavior: 'smooth' });
-        });
-      }
+
+      setupNav(prevBtn, -1);
+      setupNav(nextBtn, 1);
     }
   });
 })();

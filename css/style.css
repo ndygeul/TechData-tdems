@@ -305,6 +305,11 @@ hr.divider { border: none; height: 1px; background: linear-gradient(90deg, trans
   z-index: 20;
 }
 
+.rack-nav:hover,
+.rack-nav:active {
+  transform: translateY(-50%);
+}
+
 .rack-nav.prev { left: 0; }
 .rack-nav.next { right: 0; }
 
