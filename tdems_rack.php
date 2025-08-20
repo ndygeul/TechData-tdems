@@ -24,7 +24,9 @@ if ($rack === '') {
  * Returns an associative array keyed by rack unit number (top unit index).
  */
 function loadRackAssets(mysqli $mysqli, string $rack): array {
-  $stmt = $mysqli->prepare('SELECT asset_id, hostname, mounted_location FROM asset WHERE rack_location = ? AND del_yn = "N"');
+  $sql = 'SELECT asset_id, hostname, mounted_location, equip_barcode, ip, asset_type, manufacturer, model_name, serial_number '
+       . 'FROM asset WHERE rack_location = ? AND del_yn = "N"';
+  $stmt = $mysqli->prepare($sql);
   $stmt->bind_param('s', $rack);
   $stmt->execute();
   $res = $stmt->get_result();
@@ -42,6 +44,17 @@ function loadRackAssets(mysqli $mysqli, string $rack): array {
     } else {
       continue;
     }
+
+    // Tooltip text (multi-line) assembled from asset details
+    $parts = [];
+    if (!empty($row['equip_barcode'])) $parts[] = '설비바코드: ' . $row['equip_barcode'];
+    if (!empty($row['hostname']))      $parts[] = '호스트명: '   . $row['hostname'];
+    if (!empty($row['ip']))            $parts[] = 'IP: '         . $row['ip'];
+    if (!empty($row['asset_type']))    $parts[] = '종류: '       . $row['asset_type'];
+    if (!empty($row['manufacturer']))  $parts[] = '제조사: '     . $row['manufacturer'];
+    if (!empty($row['model_name']))    $parts[] = '모델명: '     . $row['model_name'];
+    if (!empty($row['serial_number'])) $parts[] = 'S/N: '       . $row['serial_number'];
+    $row['tooltip'] = implode("\n", $parts);
 
     $row['rowspan'] = $top - $bottom + 1;
     $assets[$top] = $row;
@@ -107,7 +120,7 @@ $stmt->close();
                 <tr class="<?= ($row && $row['asset_id'] == $assetId) ? 'rack-selected' : '' ?>">
                   <th><?= sprintf('%02d', $u) ?>U</th>
                   <?php if ($row): ?>
-                    <td rowspan="<?= $row['rowspan'] ?>"><?= h($row['hostname']) ?></td>
+                    <td rowspan="<?= $row['rowspan'] ?>" title="<?= h($row['tooltip']) ?>"><?= h($row['hostname']) ?></td>
                   <?php else: ?>
                     <td></td>
                   <?php endif; ?>
