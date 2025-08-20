@@ -72,25 +72,6 @@ while ($row = $res->fetch_assoc()) {
 }
 $stmt->close();
 
-// Ensure racks are displayed with gaps for missing numbers
-$numbers = [];
-foreach (array_keys($rackAssets) as $name) {
-  if (preg_match('/^' . preg_quote($prefix, '/') . '(\d+)/i', $name, $m)) {
-    $numbers[] = (int)$m[1];
-  }
-}
-sort($numbers);
-$ordered = [];
-if ($numbers) {
-  $min = min($numbers);
-  $max = max($numbers);
-  for ($i = $min; $i <= $max; $i++) {
-    $name = $prefix . sprintf('%02d', $i);
-    $ordered[$name] = $rackAssets[$name] ?? [];
-  }
-}
-$rackAssets = $ordered;
-
 ?>
 <!DOCTYPE html>
 <html lang="ko">
@@ -111,12 +92,8 @@ $rackAssets = $ordered;
   <main class="container narrow">
     <div class="rack-list">
       <?php foreach ($rackAssets as $rackName => $assets): ?>
-        <?php if (empty($assets)): ?>
-          <div class="rack-gap"></div>
-          <?php continue; ?>
-        <?php endif; ?>
         <section class="card">
-          <h2><?= h($rackName) ?></h2>
+          <h2 style="text-align:center;margin-top:0;"><?= h($rackName) ?></h2>
           <table class="table rack-table">
             <tbody>
               <?php for ($u = 42; $u >= 1; $u--): ?>
