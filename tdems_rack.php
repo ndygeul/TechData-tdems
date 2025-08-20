@@ -71,13 +71,13 @@ $stmt->close();
           <?php for ($u = 42; $u >= 1; $u--): ?>
             <?php if (array_key_exists($u, $assets) && $assets[$u] === false): ?>
               <tr>
-                <th><?= $u ?>U</th>
+                <th><?= sprintf('%02d', $u) ?>U</th>
               </tr>
               <?php continue; ?>
             <?php endif; ?>
             <?php $row = $assets[$u] ?? null; ?>
             <tr class="<?= ($row && $row['asset_id'] == $assetId) ? 'rack-selected' : '' ?>">
-              <th><?= $u ?>U</th>
+              <th><?= sprintf('%02d', $u) ?>U</th>
               <?php if ($row): ?>
                 <td rowspan="<?= $row['rowspan'] ?>"><?= h($row['hostname']) ?></td>
               <?php else: ?>
