@@ -266,3 +266,18 @@ code.mono {
 /* ===== Utilities ===== */
 hr.divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, var(--muted-border), transparent); margin: 12px 0; }
 
+/* ===== Rack View ===== */
+.rack-table tbody th {
+  border-top: 1px solid #1e3a5f;
+  padding: 10px;
+  color: var(--text);
+  background: #0b1d36;
+  width: 60px;
+  text-align: center;
+}
+.rack-table tbody td {
+  text-align: left;
+}
+.rack-selected td {
+  background: rgba(22,163,255,0.15);
+}

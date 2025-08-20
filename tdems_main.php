@@ -189,7 +189,16 @@ function sort_link($field, $label)
                       <code class="mono">-</code>
                     <?php endif; ?>
                   </td>
-                  <td><?= h(trim(($row['rack_location'] ?? '') . ' ' . ($row['mounted_location'] ?? ''))) ?>
+                  <td>
+                    <?php $rackLoc = trim($row['rack_location'] ?? '');
+                      $mountLoc = trim($row['mounted_location'] ?? '');
+                      if ($rackLoc !== ''): ?>
+                      <a href="tdems_rack.php?rack=<?= urlencode($rackLoc) ?>&id=<?= $id ?>">
+                        <?= h(trim($rackLoc . ' ' . $mountLoc)) ?>
+                      </a>
+                    <?php else: ?>
+                      <?= h(trim($rackLoc . ' ' . $mountLoc)) ?>
+                    <?php endif; ?>
                   </td>
                   <td><a href="<?= h($detailUrl) ?>"><?= h($row['hostname'] ?? '') ?></a></td>
                   <td><?= h($row['ip'] ?? '') ?></td>
