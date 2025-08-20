@@ -32,7 +32,7 @@ if (!function_exists('fmt_dt')) {
 function loadRackAssets(mysqli $mysqli, string $rack): array {
   $sql = 'SELECT asset_id, hostname, mounted_location, equip_barcode, ip, asset_type, manufacturer, model_name, serial_number,'
        . ' rack_location, receipt_ym, os, cpu_type, cpu_qty, cpu_core, swap_size, ma, status, facility_status, purpose,'
-       . ' purpose_detail, own_team, standard_service, unit_service, created_at, updated_at, created_ip, updated_ip '
+       . ' purpose_detail, own_team, standard_service, unit_service '
        . 'FROM asset WHERE rack_location = ? AND del_yn = "N"';
   $stmt = $mysqli->prepare($sql);
   $stmt->bind_param('s', $rack);
@@ -124,12 +124,6 @@ function loadRackAssets(mysqli $mysqli, string $rack): array {
     if (!empty($row['own_team']))       $parts[] = '자산보유팀: '   . $row['own_team'];
     if (!empty($row['standard_service']))$parts[] = '표준서비스: '  . $row['standard_service'];
     if (!empty($row['unit_service']))   $parts[] = '단위서비스: '   . $row['unit_service'];
-    if (!empty($row['created_at']))     $parts[] = '최초 등록일시: ' . fmt_dt($row['created_at']);
-    $createdBy = ip_to_user($row['created_ip'] ?? '');
-    if ($createdBy !== '')              $parts[] = '등록자: '       . $createdBy;
-    if (!empty($row['updated_at']))     $parts[] = '최종 수정일시: ' . fmt_dt($row['updated_at']);
-    $updatedBy = ip_to_user($row['updated_ip'] ?? '');
-    if ($updatedBy !== '')              $parts[] = '수정자: '       . $updatedBy;
 
     $row['tooltip'] = implode("\n", $parts);
 
