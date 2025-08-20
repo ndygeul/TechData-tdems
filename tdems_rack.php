@@ -194,7 +194,7 @@ $stmt->close();
                   <tr class="<?= ($row && $row['asset_id'] == $assetId) ? 'rack-selected' : '' ?>">
                     <th><?= sprintf('%02d', $u) ?>U</th>
                     <?php if ($row): ?>
-                      <td rowspan="<?= $row['rowspan'] ?>" title="<?= h($row['tooltip']) ?>"><?= h($row['hostname']) ?></td>
+                      <td style="text-align:center;margin-top:0;" rowspan="<?= $row['rowspan'] ?>" title="<?= h($row['tooltip']) ?>"><?= h($row['hostname']) ?></td>
                     <?php else: ?>
                       <td></td>
                     <?php endif; ?>
