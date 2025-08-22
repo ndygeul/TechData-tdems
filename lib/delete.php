@@ -56,13 +56,9 @@ if ($mode === 'bulk') {
     foreach ($ids as $id) {
       $stmt->bind_param('ssi', $reason, $ip, $id);
       if (!$stmt->execute()) {
-        $code = (int)$stmt->errno;
         $msg  = $stmt->error;
         $stmt->close();
         $db->rollback();
-        if ($code === 1062) {
-          redirect_with('../tdems_main.php', '삭제 중 제약조건 충돌(중복). 스키마에서 활성 레코드만 유니크하도록 조정 필요.');
-        }
         redirect_with('../tdems_main.php', 'DB 오류: ' . ($msg ? $msg : '오류'));
       }
       $affected += $stmt->affected_rows;
@@ -98,13 +94,9 @@ if ($mode === 'bulk') {
     }
     $stmt->bind_param('ssi', $reason, $ip, $id);
     if (!$stmt->execute()) {
-      $code = (int)$stmt->errno;
       $msg  = $stmt->error;
       $stmt->close();
       $db->rollback();
-      if ($code === 1062) {
-        redirect_with('../tdems_main.php', '삭제 중 제약조건 충돌(중복). 스키마에서 활성 레코드만 유니크하도록 조정 필요.');
-      }
       redirect_with('../tdems_main.php', 'DB 오류: ' . ($msg ? $msg : '오류'));
     }
     $affected = $stmt->affected_rows;
