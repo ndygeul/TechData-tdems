@@ -147,7 +147,7 @@
       selectName: 'standard_service_select',
       customName: 'standard_service_custom',
       hiddenName: 'standard_service',
-      presets: ['통합NMS', '지능형네트워크통합관제']
+      presets: ['지능형네트워크통합관제', '5G공동망연동시스템', '통합NMS']
     });
   }
 
@@ -156,7 +156,7 @@
       selectName: 'unit_service_select',
       customName: 'unit_service_custom',
       hiddenName: 'unit_service',
-      presets: ['통합NMS', '지능형네트워크통합관제']
+      presets: ['지능형네트워크통합관제', '5G공동망연동시스템', '무선VOC응대', '현장작업지원시스템', '통합NMS']
     });
   }
 
