@@ -268,6 +268,7 @@ $isDeleted = (($asset['del_yn'] ?? 'N') === 'Y');
               <option value="유휴">유휴</option>
               <option value="입고">입고</option>
               <option value="고장">고장</option>
+              <option value="미운용">미운용</option>
               <option value="불용대기">불용대기</option>
               <option value="불용확정">불용확정</option>
               <option value="__custom__">직접 입력</option>

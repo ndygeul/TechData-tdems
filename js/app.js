@@ -174,7 +174,7 @@
       selectName: 'facility_status_select',
       customName: 'facility_status_custom',
       hiddenName: 'facility_status',
-      presets: ['운용', '예비', '유휴', '입고', '고장', '불용대기', '불용확정']
+      presets: ['운용', '예비', '유휴', '입고', '고장', '미운용', '불용대기', '불용확정']
     });
   }
 
