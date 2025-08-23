@@ -1,5 +1,11 @@
 <?php
 require __DIR__ . '/config/db.php';
+
+if ($conn instanceof mysqli) {
+    header('Location: tdems_main.php');
+    exit;
+}
+
 function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 $msg = $_GET['msg'] ?? '';
 ?>
