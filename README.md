@@ -16,7 +16,6 @@
 [설치 방법]
 
 소스 코드를 웹 서버의 문서 루트에 복사합니다.
-PHP, Apache, MariaDB가 위와 같은 버전으로 설치되어 있는지 확인합니다.
 브라우저에서 tdems_main.php에 접속합니다.
 DB 설정이 되어있지 않은 경우 tdems_installation.php으로 Redirection 됩니다.
 DB 서버 정보(호스트, 포트, 계정, 비밀번호, DB명)를 입력하고 “저장”을 누르면
