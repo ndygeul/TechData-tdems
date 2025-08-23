@@ -1,7 +1,6 @@
 <?php
 require __DIR__ . '/config/db.php';
 
-// If database connection is already configured and active, redirect to main page
 if ($conn instanceof mysqli && @$conn->ping()) {
     header('Location: tdems_main.php');
     exit;
@@ -26,19 +25,19 @@ $msg = $_GET['msg'] ?? '';
     <section class="card">
       <form class="form" method="post" action="lib/install.php" autocomplete="off">
         <div class="form-row">
-          <label class="label" for="server">서버</label>
+          <label class="label" for="server">Host</label>
           <input class="input" type="text" id="server" name="server" value="<?= h($host) ?>" required>
         </div>
         <div class="form-row">
-          <label class="label" for="port">포트</label>
+          <label class="label" for="port">Port</label>
           <input class="input" type="text" id="port" name="port" value="<?= h($port) ?>">
         </div>
         <div class="form-row">
-          <label class="label" for="id">ID</label>
+          <label class="label" for="id">User</label>
           <input class="input" type="text" id="id" name="id" value="<?= h($user) ?>" required>
         </div>
         <div class="form-row">
-          <label class="label" for="pw">PW</label>
+          <label class="label" for="pw">Password</label>
           <input class="input" type="password" id="pw" name="pw" value="<?= h($pass) ?>">
         </div>
         <div class="form-row">
