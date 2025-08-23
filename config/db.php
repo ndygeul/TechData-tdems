@@ -1,6 +1,6 @@
 <?php
 $host = "172.17.0.4";
-$port = 30701;
+$port = "30701";
 $user = "ezk";
 $pass = "dlwlzpdl";
 $dbname = "tdems";
