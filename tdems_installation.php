@@ -26,11 +26,11 @@ $msg = $_GET['msg'] ?? '';
       <form class="form" method="post" action="lib/install.php" autocomplete="off">
         <div class="form-row">
           <label class="label" for="server">Host</label>
-          <input class="input" type="text" id="server" name="server" value="<?= h($host) ?>" required>
+          <input class="input" type="text" id="server" name="server" value="localhost" required>
         </div>
         <div class="form-row">
           <label class="label" for="port">Port</label>
-          <input class="input" type="text" id="port" name="port" value="<?= h($port) ?>">
+          <input class="input" type="text" id="port" name="port" value="3306" required>
         </div>
         <div class="form-row">
           <label class="label" for="id">User</label>
@@ -38,11 +38,11 @@ $msg = $_GET['msg'] ?? '';
         </div>
         <div class="form-row">
           <label class="label" for="pw">Password</label>
-          <input class="input" type="password" id="pw" name="pw" value="<?= h($pass) ?>">
+          <input class="input" type="password" id="pw" name="pw" value="<?= h($pass) ?>" required>
         </div>
         <div class="form-row">
           <label class="label" for="db">DB</label>
-          <input class="input" type="text" id="db" name="db" value="<?= h($dbname) ?>" required>
+          <input class="input" type="text" id="db" name="db" value="tdems" required>
         </div>
         <div class="form-actions">
           <button class="btn primary" type="submit">저장</button>
