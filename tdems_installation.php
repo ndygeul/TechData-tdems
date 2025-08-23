@@ -17,23 +17,30 @@ $msg = $_GET['msg'] ?? '';
       <div class="alert"><?= h($msg) ?></div>
     <?php endif; ?>
     <section class="card">
-      <form method="post" action="lib/install.php" style="display:flex;flex-direction:column;gap:8px;">
-        <label>서버
-          <input class="input" type="text" name="server" value="<?= h($host) ?>" required>
-        </label>
-        <label>포트
-          <input class="input" type="text" name="port" value="<?= h($port) ?>">
-        </label>
-        <label>ID
-          <input class="input" type="text" name="id" value="<?= h($user) ?>" required>
-        </label>
-        <label>PW
-          <input class="input" type="password" name="pw" value="<?= h($pass) ?>">
-        </label>
-        <label>DB
-          <input class="input" type="text" name="db" value="<?= h($dbname) ?>" required>
-        </label>
-        <button class="btn primary" type="submit">저장</button>
+      <form class="form" method="post" action="lib/install.php" autocomplete="off">
+        <div class="form-row">
+          <label class="label" for="server">서버</label>
+          <input class="input" type="text" id="server" name="server" value="<?= h($host) ?>" required>
+        </div>
+        <div class="form-row">
+          <label class="label" for="port">포트</label>
+          <input class="input" type="text" id="port" name="port" value="<?= h($port) ?>">
+        </div>
+        <div class="form-row">
+          <label class="label" for="id">ID</label>
+          <input class="input" type="text" id="id" name="id" value="<?= h($user) ?>" required>
+        </div>
+        <div class="form-row">
+          <label class="label" for="pw">PW</label>
+          <input class="input" type="password" id="pw" name="pw" value="<?= h($pass) ?>">
+        </div>
+        <div class="form-row">
+          <label class="label" for="db">DB</label>
+          <input class="input" type="text" id="db" name="db" value="<?= h($dbname) ?>" required>
+        </div>
+        <div class="form-actions">
+          <button class="btn primary" type="submit">저장</button>
+        </div>
       </form>
     </section>
   </main>
