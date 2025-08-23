@@ -1,8 +1,6 @@
-TechData Equipment Management System (TDEMS)
-
 [프로젝트 목적]
 
-TechData Equipment Management System은 서버·네트워크 등 IT 자산 정보를 통합 관리하기 위한 웹 기반 시스템입니다.
+서버·네트워크 등 IT 자산 정보를 통합 관리하기 위한 웹 기반 시스템입니다.
 장비의 위치, 사양, 상태, 용도 등을 등록·조회·수정·삭제하며, 검색 및 엑셀 내보내기를 통해 자산 현황을 손쉽게 파악할 수 있습니다.
 
 
