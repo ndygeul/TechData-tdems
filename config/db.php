@@ -1,9 +1,9 @@
 <?php
-$host = "172.17.0.4";
-$port = "30701";
-$user = "ezk";
-$pass = "dlwlzpdl";
-$dbname = "tdems";
+$host = "";
+$port = "";
+$user = "";
+$pass = "";
+$dbname = "";
 
 $conn = @new mysqli($host, $user, $pass, $dbname, $port);
 if ($conn->connect_errno) {
