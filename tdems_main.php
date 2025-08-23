@@ -1,15 +1,5 @@
 <?php
-$configPath = __DIR__ . '/config/db.php';
-if (!file_exists($configPath)) {
-  header('Location: tdems_installation.php');
-  exit;
-}
-require $configPath;
-$mysqli = isset($mysqli) ? $mysqli : (isset($conn) ? $conn : null);
-if (!$mysqli instanceof mysqli || $mysqli->connect_errno) {
-  header('Location: tdems_installation.php');
-  exit;
-}
+require __DIR__ . '/config/db.php';
 require __DIR__ . '/config/csrf.php';
 require __DIR__ . '/lib/list.php';
 
@@ -20,6 +10,13 @@ function h($s)
 function val($arr, $k, $d = '')
 {
   return isset($arr[$k]) ? $arr[$k] : $d;
+}
+
+$mysqli = isset($mysqli) ? $mysqli : (isset($conn) ? $conn : null);
+if (!$mysqli instanceof mysqli) {
+  http_response_code(500);
+  echo 'DB not initialized';
+  exit;
 }
 
 /* ===== 목록/페이지 ===== */
