@@ -1,13 +1,16 @@
 <?php
-$host = "172.17.0.4";
-$port = "30701";
-$user = "ezk";
-$pass = "dlwlzpdl";
-$dbname = "tdems";
+$host = "";
+$port = "";
+$user = "";
+$pass = "";
+$dbname = "";
 
-$conn = new mysqli($host, $user, $pass, $dbname, $port);
-if ($conn->connect_error) {
-    die("DB 연결 실패: " . $conn->connect_error);
+$conn = null;
+if ($host !== "" && $user !== "" && $dbname !== "") {
+    $conn = @new mysqli($host, $user, $pass, $dbname, $port);
+    if ($conn->connect_error) {
+        $conn = null;
+    } else {
+        $conn->set_charset("utf8mb4");
+    }
 }
-$conn->set_charset("utf8mb4");
-

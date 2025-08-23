@@ -1,5 +1,9 @@
 <?php
 require __DIR__ . '/config/db.php';
+if (!isset($conn) || !$conn instanceof mysqli) {
+  header('Location: tdems_installation.php');
+  exit;
+}
 require __DIR__ . '/config/csrf.php';
 require __DIR__ . '/lib/list.php';
 
@@ -12,12 +16,7 @@ function val($arr, $k, $d = '')
   return isset($arr[$k]) ? $arr[$k] : $d;
 }
 
-$mysqli = isset($mysqli) ? $mysqli : (isset($conn) ? $conn : null);
-if (!$mysqli instanceof mysqli) {
-  http_response_code(500);
-  echo 'DB not initialized';
-  exit;
-}
+$mysqli = $conn;
 
 /* ===== 목록/페이지 ===== */
 $params = get_search_params();
