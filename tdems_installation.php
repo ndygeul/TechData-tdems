@@ -1,7 +1,8 @@
 <?php
 require __DIR__ . '/config/db.php';
 
-if ($conn instanceof mysqli) {
+// If database connection is already configured and active, redirect to main page
+if ($conn instanceof mysqli && @$conn->ping()) {
     header('Location: tdems_main.php');
     exit;
 }
