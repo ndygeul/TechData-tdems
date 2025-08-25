@@ -15,7 +15,7 @@ if (!$__db) { http_response_code(500); exit('DB connection is not initialized.')
 $asset_id         = (int)($_POST['asset_id'] ?? 0);
 $equip_barcode    = trim($_POST['equip_barcode'] ?? '');
 $hostname         = trim($_POST['hostname'] ?? '');
-$ip_raw           = trim($_POST['ip'] ?? '');
+$ips_input        = $_POST['ip'] ?? [];
 $rack_location    = trim($_POST['rack_location'] ?? '');
 $mounted_location = trim($_POST['mounted_location'] ?? '');
 $asset_type       = trim($_POST['asset_type'] ?? '');
@@ -42,20 +42,18 @@ $updated_ip       = $_SERVER['REMOTE_ADDR'] ?? '';
 
 if ($equip_barcode === '') { $equip_barcode = null; }
 if ($hostname === '') { $hostname = null; }
-$ip = null;
-if ($ip_raw !== '') {
-  $parts = array_map('trim', explode(',', $ip_raw));
-  $ip_list = [];
-  foreach ($parts as $part) {
-    if ($part === '') continue;
-    if (filter_var($part, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
-      header('Location: ../tdems_detail.php?id='.$asset_id.'&msg=' . urlencode('IP 형식이 올바르지 않습니다(IPv4만 허용).'));
-      exit;
-    }
-    $ip_list[] = $part;
+if (!is_array($ips_input)) { $ips_input = [$ips_input]; }
+$ip_list = [];
+foreach ($ips_input as $ip_item) {
+  $ip_item = trim($ip_item);
+  if ($ip_item === '') continue;
+  if (filter_var($ip_item, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
+    header('Location: ../tdems_detail.php?id='.$asset_id.'&msg=' . urlencode('IP 형식이 올바르지 않습니다(IPv4만 허용).'));
+    exit;
   }
-  $ip = $ip_list ? implode(',', $ip_list) : null;
+  $ip_list[] = $ip_item;
 }
+$ip = $ip_list ? implode(',', $ip_list) : null;
 
 if ($asset_id <= 0) {
   header('Location: ../tdems_main.php?msg=' . urlencode('대상/필수값 오류')); exit;

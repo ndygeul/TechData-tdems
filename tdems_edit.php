@@ -13,6 +13,7 @@ if (!function_exists('fmt_dt')) {
 
 $assetId   = (int)($asset['asset_id'] ?? 0);
 $isDeleted = (($asset['del_yn'] ?? 'N') === 'Y');
+$ips       = array_filter(array_map('trim', explode(',', $asset['ip'] ?? '')));
 ?>
 <!DOCTYPE html>
 <html lang="ko">
@@ -70,11 +71,30 @@ $isDeleted = (($asset['del_yn'] ?? 'N') === 'Y');
 
         <div class="field">
           <label class="label">IP <span class="label-sub">(빈 값 허용 • IPv4만 허용)</span></label>
-          <input class="input" type="text" name="ip"
-                 placeholder="예: 10.1.23.45"
-                 title="IPv4 형식만 허용 (예: 10.1.23.45)"
-                 inputmode="numeric" maxlength="15"
-                 value="<?= htmlspecialchars($asset['ip'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+          <div id="ipFields">
+            <?php if (!empty($ips)): ?>
+              <?php foreach ($ips as $ipAddr): ?>
+                <div class="ip-item">
+                  <input class="input" type="text" name="ip[]"
+                         placeholder="예: 10.1.23.45"
+                         title="IPv4 형식만 허용 (예: 10.1.23.45)"
+                         inputmode="numeric" maxlength="15"
+                         value="<?= htmlspecialchars($ipAddr, ENT_QUOTES, 'UTF-8') ?>">
+                  <button type="button" class="btn xs ghost ip-add">+추가</button>
+                  <button type="button" class="btn xs ghost ip-remove">-삭제</button>
+                </div>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <div class="ip-item">
+                <input class="input" type="text" name="ip[]"
+                       placeholder="예: 10.1.23.45"
+                       title="IPv4 형식만 허용 (예: 10.1.23.45)"
+                       inputmode="numeric" maxlength="15">
+                <button type="button" class="btn xs ghost ip-add">+추가</button>
+                <button type="button" class="btn xs ghost ip-remove">-삭제</button>
+              </div>
+            <?php endif; ?>
+          </div>
         </div>
       </div>
 
