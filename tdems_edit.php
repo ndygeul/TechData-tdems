@@ -230,7 +230,7 @@ $ips       = array_filter(array_map('trim', explode(',', $asset['ip'] ?? '')));
                   }
                 ?>
                 <div class="ssd-item">
-                  <input class="input" type="number" name="ssd_capacity[]" value="<?= htmlspecialchars($capVal, ENT_QUOTES, 'UTF-8') ?>" placeholder="개별 용량" min="0">
+                  <input class="input" type="number" name="ssd_capacity[]" value="<?= htmlspecialchars($capVal, ENT_QUOTES, 'UTF-8') ?>" placeholder="개별 용량" min="0" step="0.01">
                   <select class="select" name="ssd_unit[]">
                     <option value="GB" <?= $unit === 'GB' ? 'selected' : '' ?>>GB</option>
                     <option value="TB" <?= $unit === 'TB' ? 'selected' : '' ?>>TB</option>
@@ -242,7 +242,7 @@ $ips       = array_filter(array_map('trim', explode(',', $asset['ip'] ?? '')));
               <?php endforeach; ?>
             <?php else: ?>
               <div class="ssd-item">
-                <input class="input" type="number" name="ssd_capacity[]" placeholder="개별 용량" min="0">
+                <input class="input" type="number" name="ssd_capacity[]" placeholder="개별 용량" min="0" step="0.01">
                 <select class="select" name="ssd_unit[]">
                   <option value="GB">GB</option>
                   <option value="TB">TB</option>
@@ -270,7 +270,7 @@ $ips       = array_filter(array_map('trim', explode(',', $asset['ip'] ?? '')));
                   }
                 ?>
                 <div class="hdd-item">
-                  <input class="input" type="number" name="hdd_capacity[]" value="<?= htmlspecialchars($capVal, ENT_QUOTES, 'UTF-8') ?>" placeholder="개별 용량" min="0">
+                  <input class="input" type="number" name="hdd_capacity[]" value="<?= htmlspecialchars($capVal, ENT_QUOTES, 'UTF-8') ?>" placeholder="개별 용량" min="0" step="0.01">
                   <select class="select" name="hdd_unit[]">
                     <option value="GB" <?= $unit === 'GB' ? 'selected' : '' ?>>GB</option>
                     <option value="TB" <?= $unit === 'TB' ? 'selected' : '' ?>>TB</option>
@@ -282,7 +282,7 @@ $ips       = array_filter(array_map('trim', explode(',', $asset['ip'] ?? '')));
               <?php endforeach; ?>
             <?php else: ?>
               <div class="hdd-item">
-                <input class="input" type="number" name="hdd_capacity[]" placeholder="개별 용량" min="0">
+                <input class="input" type="number" name="hdd_capacity[]" placeholder="개별 용량" min="0" step="0.01">
                 <select class="select" name="hdd_unit[]">
                   <option value="GB">GB</option>
                   <option value="TB">TB</option>
