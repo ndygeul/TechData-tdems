@@ -54,8 +54,8 @@ function render_history($text) {
 $assetId   = (int)($asset['asset_id'] ?? 0);
 $isDeleted = (($asset['del_yn'] ?? 'N') === 'Y');
 
-$createdBy = isset($asset['created_ip']) ? ip_to_user($asset['created_ip']) : '';
-$updatedBy = isset($asset['updated_ip']) ? ip_to_user($asset['updated_ip']) : '';
+$createdBy = $asset['created_user'] ?? ip_to_user($asset['created_ip'] ?? '');
+$updatedBy = $asset['updated_user'] ?? ip_to_user($asset['updated_ip'] ?? '');
 
 if ($assetId <= 0) {
   http_response_code(404);

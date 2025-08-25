@@ -22,7 +22,7 @@ $asset_id        = (int)($_GET['id'] ?? $_POST['id'] ?? $_POST['asset_id'] ?? 0)
 $include_deleted = (int)($_GET['include_deleted'] ?? 0);
 
 // 조회 컬럼(명시적으로 작성: get_result 미사용 폴백용)
-$cols = "asset_id,equip_barcode,hostname,ip,asset_type,own_team,standard_service,unit_service,rack_location,mounted_location,manufacturer,model_name,serial_number,receipt_ym,os,cpu_type,cpu_qty,cpu_core,swap_size,ma,status,purpose,purpose_detail,facility_status,asset_history,created_at,updated_at,created_ip,updated_ip,del_yn,deleted_at,deleted_reason";
+$cols = "asset_id,equip_barcode,hostname,ip,asset_type,own_team,standard_service,unit_service,rack_location,mounted_location,manufacturer,model_name,serial_number,receipt_ym,os,cpu_type,cpu_qty,cpu_core,swap_size,ma,status,purpose,purpose_detail,facility_status,asset_history,created_at,updated_at,created_ip,updated_ip,created_user,updated_user,del_yn,deleted_at,deleted_reason";
 
 $asset = null;
 if ($asset_id > 0) {
@@ -52,6 +52,7 @@ if ($asset_id > 0) {
                     $f_cpu_type, $f_cpu_qty, $f_cpu_core, $f_swap_size,
                     $f_ma, $f_status, $f_purpose, $f_purpose_detail, $f_facility_status,
                     $f_asset_history, $f_created_at, $f_updated_at, $f_created_ip, $f_updated_ip,
+                    $f_created_user, $f_updated_user,
                     $f_del_yn, $f_deleted_at, $f_deleted_reason
                 );
                 if ($stmt->fetch()) {
@@ -85,6 +86,8 @@ if ($asset_id > 0) {
                         'updated_at'      => $f_updated_at,
                         'created_ip'      => $f_created_ip,
                         'updated_ip'      => $f_updated_ip,
+                        'created_user'    => $f_created_user,
+                        'updated_user'    => $f_updated_user,
                         'del_yn'          => $f_del_yn,
                         'deleted_at'      => $f_deleted_at,
                         'deleted_reason'  => $f_deleted_reason,

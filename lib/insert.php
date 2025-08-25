@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/csrf.php';
+require_once __DIR__ . '/../config/user.php';
 
 csrf_check_or_die();
 
@@ -36,6 +37,9 @@ $purpose_detail   = trim($_POST['purpose_detail'] ?? '');
 $facility_status  = trim($_POST['facility_status'] ?? '');
 $asset_history    = trim($_POST['asset_history'] ?? '');
 $created_ip       = $_SERVER['REMOTE_ADDR'] ?? '';
+$updated_ip       = $created_ip;
+$created_user     = ip_to_user($created_ip);
+$updated_user     = $created_user;
 
 if ($equip_barcode === '') { $equip_barcode = null; }
 if ($hostname === '') { $hostname = null; }
@@ -68,17 +72,17 @@ $sql = "INSERT INTO asset
          asset_type, own_team, standard_service, unit_service, manufacturer, model_name, serial_number, receipt_ym,
          os, cpu_type, cpu_qty, cpu_core, swap_size,
          ma, status, purpose, purpose_detail, facility_status,
-         asset_history, created_at, updated_at, created_ip, updated_ip, del_yn)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, NOW(), NOW(), ?, ?, 'N')";
+         asset_history, created_at, updated_at, created_ip, updated_ip, created_user, updated_user, del_yn)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, NOW(), NOW(), ?, ?, ?, ?, 'N')";
 $stmt = $__db->prepare($sql);
 if (!$stmt) { header('Location: ../tdems_write.php?msg=' . urlencode('DB 오류(prepare): '.$__db->error)); exit; }
 $stmt->bind_param(
-  'sssssssssssssssiisssssssss',
+  'sssssssssssssssiisssssssssss',
   $equip_barcode, $hostname, $ip, $rack_location, $mounted_location,
   $asset_type, $own_team, $standard_service, $unit_service, $manufacturer, $model_name, $serial_number, $receipt_ym,
   $os, $cpu_type, $cpu_qty, $cpu_core, $swap_size,
   $ma, $status, $purpose, $purpose_detail, $facility_status,
-  $asset_history, $created_ip, $created_ip
+  $asset_history, $created_ip, $updated_ip, $created_user, $updated_user
 );
 if (!$stmt->execute()) {
   $err = $stmt->error ?: $__db->error; $stmt->close();

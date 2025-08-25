@@ -39,6 +39,7 @@ $facility_status  = trim($_POST['facility_status'] ?? '');
 $asset_history_edit = isset($_POST['asset_history_edit']) ? trim($_POST['asset_history_edit']) : null;
 $history_append     = trim($_POST['history_append'] ?? '');
 $updated_ip       = $_SERVER['REMOTE_ADDR'] ?? '';
+$updated_user     = ip_to_user($updated_ip);
 
 if ($equip_barcode === '') { $equip_barcode = null; }
 if ($hostname === '') { $hostname = null; }
@@ -95,17 +96,17 @@ if ($asset_history_edit !== null) {
               asset_type=?, own_team=?, standard_service=?, unit_service=?, manufacturer=?, model_name=?, serial_number=?, receipt_ym=?,
               os=?, cpu_type=?, cpu_qty=?, cpu_core=?, swap_size=?,
               ma=?, status=?, purpose=?, purpose_detail=?, facility_status=?,
-              asset_history=?, updated_at=NOW(), updated_ip=?
+              asset_history=?, updated_at=NOW(), updated_ip=?, updated_user=?
           WHERE asset_id=?";
   $stmt = $__db->prepare($sql);
   if (!$stmt) { header('Location: ../tdems_detail.php?id='.$asset_id.'&msg=' . urlencode('DB 오류(prepare): '.$__db->error)); exit; }
   $stmt->bind_param(
-    'sssssssssssssssiissssssssi',
+    'sssssssssssssssiisssssssssi',
     $equip_barcode, $hostname, $ip, $rack_location, $mounted_location,
     $asset_type, $own_team, $standard_service, $unit_service, $manufacturer, $model_name, $serial_number, $receipt_ym,
     $os, $cpu_type, $cpu_qty, $cpu_core, $swap_size,
     $ma, $status, $purpose, $purpose_detail, $facility_status,
-    $final_history, $updated_ip, $asset_id
+    $final_history, $updated_ip, $updated_user, $asset_id
   );
 } elseif ($appendBlock !== '') {
   $sql = "UPDATE asset
@@ -114,7 +115,25 @@ if ($asset_history_edit !== null) {
               os=?, cpu_type=?, cpu_qty=?, cpu_core=?, swap_size=?,
               ma=?, status=?, purpose=?, purpose_detail=?, facility_status=?,
               asset_history=CONCAT(COALESCE(asset_history,''), ?),
-              updated_at=NOW(), updated_ip=?
+              updated_at=NOW(), updated_ip=?, updated_user=?
+          WHERE asset_id=?";
+  $stmt = $__db->prepare($sql);
+  if (!$stmt) { header('Location: ../tdems_detail.php?id='.$asset_id.'&msg=' . urlencode('DB 오류(prepare): '.$__db->error)); exit; }
+  $stmt->bind_param(
+    'sssssssssssssssiisssssssssi',
+    $equip_barcode, $hostname, $ip, $rack_location, $mounted_location,
+    $asset_type, $own_team, $standard_service, $unit_service, $manufacturer, $model_name, $serial_number, $receipt_ym,
+    $os, $cpu_type, $cpu_qty, $cpu_core, $swap_size,
+    $ma, $status, $purpose, $purpose_detail, $facility_status,
+    $appendBlock, $updated_ip, $updated_user, $asset_id
+  );
+} else {
+  $sql = "UPDATE asset
+          SET equip_barcode=?, hostname=?, ip=?, rack_location=?, mounted_location=?,
+              asset_type=?, own_team=?, standard_service=?, unit_service=?, manufacturer=?, model_name=?, serial_number=?, receipt_ym=?,
+              os=?, cpu_type=?, cpu_qty=?, cpu_core=?, swap_size=?,
+              ma=?, status=?, purpose=?, purpose_detail=?, facility_status=?,
+              updated_at=NOW(), updated_ip=?, updated_user=?
           WHERE asset_id=?";
   $stmt = $__db->prepare($sql);
   if (!$stmt) { header('Location: ../tdems_detail.php?id='.$asset_id.'&msg=' . urlencode('DB 오류(prepare): '.$__db->error)); exit; }
@@ -124,25 +143,7 @@ if ($asset_history_edit !== null) {
     $asset_type, $own_team, $standard_service, $unit_service, $manufacturer, $model_name, $serial_number, $receipt_ym,
     $os, $cpu_type, $cpu_qty, $cpu_core, $swap_size,
     $ma, $status, $purpose, $purpose_detail, $facility_status,
-    $appendBlock, $updated_ip, $asset_id
-  );
-} else {
-  $sql = "UPDATE asset
-          SET equip_barcode=?, hostname=?, ip=?, rack_location=?, mounted_location=?,
-              asset_type=?, own_team=?, standard_service=?, unit_service=?, manufacturer=?, model_name=?, serial_number=?, receipt_ym=?,
-              os=?, cpu_type=?, cpu_qty=?, cpu_core=?, swap_size=?,
-              ma=?, status=?, purpose=?, purpose_detail=?, facility_status=?,
-              updated_at=NOW(), updated_ip=?
-          WHERE asset_id=?";
-  $stmt = $__db->prepare($sql);
-  if (!$stmt) { header('Location: ../tdems_detail.php?id='.$asset_id.'&msg=' . urlencode('DB 오류(prepare): '.$__db->error)); exit; }
-  $stmt->bind_param(
-    'sssssssssssssssiisssssssi',
-    $equip_barcode, $hostname, $ip, $rack_location, $mounted_location,
-    $asset_type, $own_team, $standard_service, $unit_service, $manufacturer, $model_name, $serial_number, $receipt_ym,
-    $os, $cpu_type, $cpu_qty, $cpu_core, $swap_size,
-    $ma, $status, $purpose, $purpose_detail, $facility_status,
-    $updated_ip, $asset_id
+    $updated_ip, $updated_user, $asset_id
   );
 }
 
