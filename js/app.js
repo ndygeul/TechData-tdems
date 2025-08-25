@@ -179,7 +179,7 @@
   }
 
   // ===== 동적 입력 필드 (MEMORY/SSD/HDD) =====
-  function initDynamicFields(container, itemClass, addClass, removeClass) {
+  function initDynamicFields(container, itemClass, addClass, removeClass, onAdd) {
     if (!container) return;
 
     function refresh() {
@@ -195,7 +195,10 @@
         const row = e.target.closest('.' + itemClass);
         if (!row) return;
         const clone = row.cloneNode(true);
-        $all('input', clone).forEach(inp => inp.value = '');
+        $all('input', clone).forEach(inp => {
+          inp.value = '';
+          if (typeof onAdd === 'function') onAdd(inp);
+        });
         container.appendChild(clone);
         refresh();
       } else if (e.target.classList.contains(removeClass)) {
@@ -288,6 +291,7 @@
     initDynamicFields(document.getElementById('memFields'), 'mem-item', 'mem-add', 'mem-remove');
     initDynamicFields(document.getElementById('ssdFields'), 'ssd-item', 'ssd-add', 'ssd-remove');
     initDynamicFields(document.getElementById('hddFields'), 'hdd-item', 'hdd-add', 'hdd-remove');
+    initDynamicFields(document.getElementById('ipFields'), 'ip-item', 'ip-add', 'ip-remove', bindIPv4Validation);
 
     // ---- 드롭다운 + 직접입력 컨트롤 초기화 ----
     $all('.manufacturer-field').forEach(initManufacturerField);
@@ -299,7 +303,7 @@
     $all('.facility-status-field').forEach(initFacilityStatusField);
 
     // ---- IP 입력 검증 바인딩 ----
-    $all('input[name="ip"]').forEach(bindIPv4Validation);
+    $all('input[name^="ip"]').forEach(bindIPv4Validation);
 
     // ---- 랙 리스트 좌/우 이동 버튼 ----
     const rackList = document.querySelector('.rack-list');

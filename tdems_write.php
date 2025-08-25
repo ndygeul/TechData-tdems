@@ -48,10 +48,16 @@ $csrf = csrf_token();
 
         <div class="field">
           <label class="label">IP <span class="label-sub">(빈 값 허용 • IPv4만 허용)</span></label>
-          <input class="input" type="text" name="ip"
-                 placeholder="예: 10.1.23.45"
-                 title="IPv4 형식만 허용 (예: 10.1.23.45)"
-                 inputmode="numeric" maxlength="15">
+          <div id="ipFields">
+            <div class="ip-item">
+              <input class="input" type="text" name="ip[]"
+                     placeholder="예: 10.1.23.45"
+                     title="IPv4 형식만 허용 (예: 10.1.23.45)"
+                     inputmode="numeric" maxlength="15">
+              <button type="button" class="btn xs ghost ip-add">+추가</button>
+              <button type="button" class="btn xs ghost ip-remove">-삭제</button>
+            </div>
+          </div>
         </div>
       </div>
 

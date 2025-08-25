@@ -13,7 +13,7 @@ if (!$__db) { http_response_code(500); exit('DB connection is not initialized.')
 // 입력
 $equip_barcode    = trim($_POST['equip_barcode'] ?? '');
 $hostname         = trim($_POST['hostname'] ?? '');
-$ip               = trim($_POST['ip'] ?? '');
+$ips_input        = $_POST['ip'] ?? [];
 $rack_location    = trim($_POST['rack_location'] ?? '');
 $mounted_location = trim($_POST['mounted_location'] ?? '');
 $asset_type       = trim($_POST['asset_type'] ?? '');
@@ -39,12 +39,18 @@ $created_ip       = $_SERVER['REMOTE_ADDR'] ?? '';
 
 if ($equip_barcode === '') { $equip_barcode = null; }
 if ($hostname === '') { $hostname = null; }
-if ($ip === '') { $ip = null; }
-// IPv4 검증 (빈 값 허용)
-if ($ip !== null && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
-  header('Location: ../tdems_write.php?msg=' . urlencode('IP 형식이 올바르지 않습니다(IPv4만 허용).'));
-  exit;
+if (!is_array($ips_input)) { $ips_input = [$ips_input]; }
+$ip_list = [];
+foreach ($ips_input as $ip_item) {
+  $ip_item = trim($ip_item);
+  if ($ip_item === '') continue;
+  if (filter_var($ip_item, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
+    header('Location: ../tdems_write.php?msg=' . urlencode('IP 형식이 올바르지 않습니다(IPv4만 허용).'));
+    exit;
+  }
+  $ip_list[] = $ip_item;
 }
+$ip = $ip_list ? implode(',', $ip_list) : null;
 
 // 중복 체크 (설비바코드가 있을 때만)
 if ($equip_barcode !== null) {
