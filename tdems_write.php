@@ -209,6 +209,7 @@ $csrf = csrf_token();
               <option value="유휴">유휴</option>
               <option value="입고">입고</option>
               <option value="고장">고장</option>
+              <option value="미운용">미운용</option>
               <option value="불용대기">불용대기</option>
               <option value="불용확정">불용확정</option>
               <option value="__custom__">직접 입력</option>
@@ -262,8 +263,9 @@ $csrf = csrf_token();
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <select class="select" name="standard_service_select">
               <option value="">선택</option>
-              <option value="통합NMS">통합NMS</option>
               <option value="지능형네트워크통합관제">지능형네트워크통합관제</option>
+              <option value="5G공동망연동시스템">5G공동망연동시스템</option>
+              <option value="통합NMS">통합NMS</option>
               <option value="__custom__">직접 입력</option>
             </select>
             <input class="input" type="text" name="standard_service_custom"
@@ -276,8 +278,11 @@ $csrf = csrf_token();
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <select class="select" name="unit_service_select">
               <option value="">선택</option>
-              <option value="통합NMS">통합NMS</option>
               <option value="지능형네트워크통합관제">지능형네트워크통합관제</option>
+              <option value="5G공동망연동시스템">5G공동망연동시스템</option>
+              <option value="무선VOC응대">무선VOC응대</option>
+              <option value="현장작업지원시스템">현장작업지원시스템</option>
+              <option value="통합NMS">통합NMS</option>
               <option value="__custom__">직접 입력</option>
             </select>
             <input class="input" type="text" name="unit_service_custom"

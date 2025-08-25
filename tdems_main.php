@@ -1,5 +1,9 @@
 <?php
 require __DIR__ . '/config/db.php';
+if (!isset($conn) || !$conn instanceof mysqli) {
+  header('Location: tdems_installation.php');
+  exit;
+}
 require __DIR__ . '/config/csrf.php';
 require __DIR__ . '/lib/list.php';
 
@@ -12,12 +16,7 @@ function val($arr, $k, $d = '')
   return isset($arr[$k]) ? $arr[$k] : $d;
 }
 
-$mysqli = isset($mysqli) ? $mysqli : (isset($conn) ? $conn : null);
-if (!$mysqli instanceof mysqli) {
-  http_response_code(500);
-  echo 'DB not initialized';
-  exit;
-}
+$mysqli = $conn;
 
 /* ===== 목록/페이지 ===== */
 $params = get_search_params();
@@ -223,7 +222,9 @@ function sort_link($field, $label)
                         <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                         <input type="hidden" name="id" value="<?= $id ?>">
                         <input type="hidden" name="reason" value="">
+<!--
                         <button type="button" class="btn xs danger single-delete-btn">삭제</button>
+-->
                       </form>
                     <?php else: ?>
                       <span class="badge gray">삭제됨</span>
