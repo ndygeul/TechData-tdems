@@ -45,15 +45,20 @@ function loadRackAssets(mysqli $mysqli, string $rack): array {
   $assets = [];
   while ($row = $res->fetch_assoc()) {
     $loc = strtoupper(trim($row['mounted_location'] ?? ''));
+    $ranges = [];
     if ($loc === 'ALL') {
-      $bottom = 1;
-      $top = 42;
-    } elseif (preg_match('/^(\d{2})(?:-(\d{2}))?$/', $loc, $m)) {
-      $start = (int)$m[1];
-      $end = isset($m[2]) ? (int)$m[2] : $start;
-      $bottom = min($start, $end);
-      $top = max($start, $end);
+      $ranges[] = [1, 42];
     } else {
+      foreach (explode(',', $loc) as $seg) {
+        $seg = trim($seg);
+        if (preg_match('/^(\d{2})(?:-(\d{2}))?$/', $seg, $m)) {
+          $start = (int)$m[1];
+          $end   = isset($m[2]) ? (int)$m[2] : $start;
+          $ranges[] = [min($start, $end), max($start, $end)];
+        }
+      }
+    }
+    if (!$ranges) {
       continue;
     }
 
@@ -135,10 +140,13 @@ function loadRackAssets(mysqli $mysqli, string $rack): array {
 
     $row['tooltip'] = implode("\n", $parts);
 
-    $row['rowspan'] = $top - $bottom + 1;
-    $assets[$top] = $row;
-    for ($u = $bottom; $u < $top; $u++) {
-      $assets[$u] = false;
+    foreach ($ranges as [$bottom, $top]) {
+      $rowCopy = $row;
+      $rowCopy['rowspan'] = $top - $bottom + 1;
+      $assets[$top] = $rowCopy;
+      for ($u = $bottom; $u < $top; $u++) {
+        $assets[$u] = false;
+      }
     }
   }
   $stmt->close();
