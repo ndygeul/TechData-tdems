@@ -199,6 +199,7 @@
           inp.value = '';
           if (typeof onAdd === 'function') onAdd(inp);
         });
+        $all('select', clone).forEach(sel => { sel.selectedIndex = 0; });
         container.appendChild(clone);
         refresh();
       } else if (e.target.classList.contains(removeClass)) {

@@ -161,7 +161,11 @@ $csrf = csrf_token();
           <label class="label">SSD</label>
           <div id="ssdFields">
             <div class="ssd-item">
-              <input class="input" type="text" name="ssd_capacity[]" placeholder="개별 용량">
+              <input class="input" type="number" name="ssd_capacity[]" placeholder="개별 용량" min="0">
+              <select class="select" name="ssd_unit[]">
+                <option value="GB">GB</option>
+                <option value="TB">TB</option>
+              </select>
               <input class="input" type="number" name="ssd_qty[]" placeholder="수량" min="1">
               <button type="button" class="btn xs ghost ssd-add">+추가</button>
               <button type="button" class="btn xs ghost ssd-remove">-삭제</button>
@@ -172,7 +176,11 @@ $csrf = csrf_token();
           <label class="label">HDD</label>
           <div id="hddFields">
             <div class="hdd-item">
-              <input class="input" type="text" name="hdd_capacity[]" placeholder="개별 용량">
+              <input class="input" type="number" name="hdd_capacity[]" placeholder="개별 용량" min="0">
+              <select class="select" name="hdd_unit[]">
+                <option value="GB">GB</option>
+                <option value="TB">TB</option>
+              </select>
               <input class="input" type="number" name="hdd_qty[]" placeholder="수량" min="1">
               <button type="button" class="btn xs ghost hdd-add">+추가</button>
               <button type="button" class="btn xs ghost hdd-remove">-삭제</button>

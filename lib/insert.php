@@ -110,16 +110,20 @@ if ($equip_barcode !== null) {
 
   // SSD
   $ssd_caps = $_POST['ssd_capacity'] ?? [];
+  $ssd_units = $_POST['ssd_unit'] ?? [];
   $ssd_qtys = $_POST['ssd_qty'] ?? [];
-  if (is_array($ssd_caps) && is_array($ssd_qtys)) {
+  if (is_array($ssd_caps) && is_array($ssd_qtys) && is_array($ssd_units)) {
     $sql2 = "INSERT INTO asset_ssd (equip_barcode, capacity, quantity) VALUES (?,?,?)";
     $stmt2 = $__db->prepare($sql2);
     if ($stmt2) {
       $cap = $qty = null;
       $stmt2->bind_param('ssi', $equip_barcode, $cap, $qty);
-      $cnt = min(count($ssd_caps), count($ssd_qtys));
+      $cnt = min(count($ssd_caps), count($ssd_qtys), count($ssd_units));
       for ($i = 0; $i < $cnt; $i++) {
-        $cap = trim($ssd_caps[$i]);
+        $capNum = trim($ssd_caps[$i]);
+        $unit = strtoupper(trim($ssd_units[$i] ?? ''));
+        if (!in_array($unit, ['GB','TB'], true)) { $unit = 'GB'; }
+        $cap = ($capNum === '') ? '' : ($capNum . $unit);
         $qty = (int)$ssd_qtys[$i];
         if ($cap === '' || $qty <= 0) continue;
         $stmt2->execute();
@@ -130,16 +134,20 @@ if ($equip_barcode !== null) {
 
   // HDD
   $hdd_caps = $_POST['hdd_capacity'] ?? [];
+  $hdd_units = $_POST['hdd_unit'] ?? [];
   $hdd_qtys = $_POST['hdd_qty'] ?? [];
-  if (is_array($hdd_caps) && is_array($hdd_qtys)) {
+  if (is_array($hdd_caps) && is_array($hdd_qtys) && is_array($hdd_units)) {
     $sql2 = "INSERT INTO asset_hdd (equip_barcode, capacity, quantity) VALUES (?,?,?)";
     $stmt2 = $__db->prepare($sql2);
     if ($stmt2) {
       $cap = $qty = null;
       $stmt2->bind_param('ssi', $equip_barcode, $cap, $qty);
-      $cnt = min(count($hdd_caps), count($hdd_qtys));
+      $cnt = min(count($hdd_caps), count($hdd_qtys), count($hdd_units));
       for ($i = 0; $i < $cnt; $i++) {
-        $cap = trim($hdd_caps[$i]);
+        $capNum = trim($hdd_caps[$i]);
+        $unit = strtoupper(trim($hdd_units[$i] ?? ''));
+        if (!in_array($unit, ['GB','TB'], true)) { $unit = 'GB'; }
+        $cap = ($capNum === '') ? '' : ($capNum . $unit);
         $qty = (int)$hdd_qtys[$i];
         if ($cap === '' || $qty <= 0) continue;
         $stmt2->execute();
