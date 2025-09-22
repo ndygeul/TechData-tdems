@@ -2,6 +2,7 @@
 // lib/delete.php
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/csrf.php';
+require_once __DIR__ . '/../config/user.php';
 
 csrf_check_or_die();
 
@@ -14,6 +15,7 @@ if (!$db) { http_response_code(500); exit('DB connection is not initialized.'); 
 $mode   = isset($_POST['mode']) ? $_POST['mode'] : '';
 $reason = isset($_POST['reason']) ? trim($_POST['reason']) : '';
 $ip     = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+$user   = ip_to_user($ip);
 
 function redirect_with($url, $msg) {
   header('Location: ' . $url . (strpos($url,'?')!==false ? '&' : '?') . 'msg=' . urlencode($msg));
@@ -45,7 +47,8 @@ if ($mode === 'bulk') {
                   deleted_at=NOW(),
                   deleted_reason=?,
                   updated_at=NOW(),
-                  updated_ip=?
+                  updated_ip=?,
+                  updated_user=?
             WHERE asset_id=? AND del_yn='N'";
     $stmt = $db->prepare($sql);
     if (!$stmt) {
@@ -54,7 +57,7 @@ if ($mode === 'bulk') {
 
     $affected = 0;
     foreach ($ids as $id) {
-      $stmt->bind_param('ssi', $reason, $ip, $id);
+      $stmt->bind_param('sssi', $reason, $ip, $user, $id);
       if (!$stmt->execute()) {
         $msg  = $stmt->error;
         $stmt->close();
@@ -86,13 +89,14 @@ if ($mode === 'bulk') {
                   deleted_at=NOW(),
                   deleted_reason=?,
                   updated_at=NOW(),
-                  updated_ip=?
+                  updated_ip=?,
+                  updated_user=?
             WHERE asset_id=? AND del_yn='N'";
     $stmt = $db->prepare($sql);
     if (!$stmt) {
       throw new Exception($db->error ? $db->error : 'prepare failed', (int)$db->errno);
     }
-    $stmt->bind_param('ssi', $reason, $ip, $id);
+    $stmt->bind_param('sssi', $reason, $ip, $user, $id);
     if (!$stmt->execute()) {
       $msg  = $stmt->error;
       $stmt->close();

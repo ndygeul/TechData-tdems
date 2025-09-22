@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/csrf.php';
+require_once __DIR__ . '/../config/user.php';
 
 csrf_check_or_die();
 
@@ -13,7 +14,7 @@ if (!$__db) { http_response_code(500); exit('DB connection is not initialized.')
 // 입력
 $equip_barcode    = trim($_POST['equip_barcode'] ?? '');
 $hostname         = trim($_POST['hostname'] ?? '');
-$ip               = trim($_POST['ip'] ?? '');
+$ips_input        = $_POST['ip'] ?? [];
 $rack_location    = trim($_POST['rack_location'] ?? '');
 $mounted_location = trim($_POST['mounted_location'] ?? '');
 $asset_type       = trim($_POST['asset_type'] ?? '');
@@ -36,15 +37,24 @@ $purpose_detail   = trim($_POST['purpose_detail'] ?? '');
 $facility_status  = trim($_POST['facility_status'] ?? '');
 $asset_history    = trim($_POST['asset_history'] ?? '');
 $created_ip       = $_SERVER['REMOTE_ADDR'] ?? '';
+$updated_ip       = $created_ip;
+$created_user     = ip_to_user($created_ip);
+$updated_user     = $created_user;
 
 if ($equip_barcode === '') { $equip_barcode = null; }
 if ($hostname === '') { $hostname = null; }
-if ($ip === '') { $ip = null; }
-// IPv4 검증 (빈 값 허용)
-if ($ip !== null && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
-  header('Location: ../tdems_write.php?msg=' . urlencode('IP 형식이 올바르지 않습니다(IPv4만 허용).'));
-  exit;
+if (!is_array($ips_input)) { $ips_input = [$ips_input]; }
+$ip_list = [];
+foreach ($ips_input as $ip_item) {
+  $ip_item = trim($ip_item);
+  if ($ip_item === '') continue;
+  if (filter_var($ip_item, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
+    header('Location: ../tdems_write.php?msg=' . urlencode('IP 형식이 올바르지 않습니다(IPv4만 허용).'));
+    exit;
+  }
+  $ip_list[] = $ip_item;
 }
+$ip = $ip_list ? implode(',', $ip_list) : null;
 
 // 중복 체크 (설비바코드가 있을 때만)
 if ($equip_barcode !== null) {
@@ -62,17 +72,17 @@ $sql = "INSERT INTO asset
          asset_type, own_team, standard_service, unit_service, manufacturer, model_name, serial_number, receipt_ym,
          os, cpu_type, cpu_qty, cpu_core, swap_size,
          ma, status, purpose, purpose_detail, facility_status,
-         asset_history, created_at, updated_at, created_ip, updated_ip, del_yn)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, NOW(), NOW(), ?, ?, 'N')";
+         asset_history, created_at, updated_at, created_ip, updated_ip, created_user, updated_user, del_yn)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, NOW(), NOW(), ?, ?, ?, ?, 'N')";
 $stmt = $__db->prepare($sql);
 if (!$stmt) { header('Location: ../tdems_write.php?msg=' . urlencode('DB 오류(prepare): '.$__db->error)); exit; }
 $stmt->bind_param(
-  'sssssssssssssssiisssssssss',
+  'sssssssssssssssiisssssssssss',
   $equip_barcode, $hostname, $ip, $rack_location, $mounted_location,
   $asset_type, $own_team, $standard_service, $unit_service, $manufacturer, $model_name, $serial_number, $receipt_ym,
   $os, $cpu_type, $cpu_qty, $cpu_core, $swap_size,
   $ma, $status, $purpose, $purpose_detail, $facility_status,
-  $asset_history, $created_ip, $created_ip
+  $asset_history, $created_ip, $updated_ip, $created_user, $updated_user
 );
 if (!$stmt->execute()) {
   $err = $stmt->error ?: $__db->error; $stmt->close();
@@ -104,16 +114,20 @@ if ($equip_barcode !== null) {
 
   // SSD
   $ssd_caps = $_POST['ssd_capacity'] ?? [];
+  $ssd_units = $_POST['ssd_unit'] ?? [];
   $ssd_qtys = $_POST['ssd_qty'] ?? [];
-  if (is_array($ssd_caps) && is_array($ssd_qtys)) {
+  if (is_array($ssd_caps) && is_array($ssd_qtys) && is_array($ssd_units)) {
     $sql2 = "INSERT INTO asset_ssd (equip_barcode, capacity, quantity) VALUES (?,?,?)";
     $stmt2 = $__db->prepare($sql2);
     if ($stmt2) {
       $cap = $qty = null;
       $stmt2->bind_param('ssi', $equip_barcode, $cap, $qty);
-      $cnt = min(count($ssd_caps), count($ssd_qtys));
+      $cnt = min(count($ssd_caps), count($ssd_qtys), count($ssd_units));
       for ($i = 0; $i < $cnt; $i++) {
-        $cap = trim($ssd_caps[$i]);
+        $capNum = trim($ssd_caps[$i]);
+        $unit = strtoupper(trim($ssd_units[$i] ?? ''));
+        if (!in_array($unit, ['GB','TB'], true)) { $unit = 'GB'; }
+        $cap = ($capNum === '') ? '' : ($capNum . $unit);
         $qty = (int)$ssd_qtys[$i];
         if ($cap === '' || $qty <= 0) continue;
         $stmt2->execute();
@@ -124,16 +138,20 @@ if ($equip_barcode !== null) {
 
   // HDD
   $hdd_caps = $_POST['hdd_capacity'] ?? [];
+  $hdd_units = $_POST['hdd_unit'] ?? [];
   $hdd_qtys = $_POST['hdd_qty'] ?? [];
-  if (is_array($hdd_caps) && is_array($hdd_qtys)) {
+  if (is_array($hdd_caps) && is_array($hdd_qtys) && is_array($hdd_units)) {
     $sql2 = "INSERT INTO asset_hdd (equip_barcode, capacity, quantity) VALUES (?,?,?)";
     $stmt2 = $__db->prepare($sql2);
     if ($stmt2) {
       $cap = $qty = null;
       $stmt2->bind_param('ssi', $equip_barcode, $cap, $qty);
-      $cnt = min(count($hdd_caps), count($hdd_qtys));
+      $cnt = min(count($hdd_caps), count($hdd_qtys), count($hdd_units));
       for ($i = 0; $i < $cnt; $i++) {
-        $cap = trim($hdd_caps[$i]);
+        $capNum = trim($hdd_caps[$i]);
+        $unit = strtoupper(trim($hdd_units[$i] ?? ''));
+        if (!in_array($unit, ['GB','TB'], true)) { $unit = 'GB'; }
+        $cap = ($capNum === '') ? '' : ($capNum . $unit);
         $qty = (int)$hdd_qtys[$i];
         if ($cap === '' || $qty <= 0) continue;
         $stmt2->execute();

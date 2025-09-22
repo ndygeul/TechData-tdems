@@ -12,6 +12,10 @@ if (!function_exists('fmt_dt')) {
   function fmt_dt($ts){ return $ts ? date('Y-m-d H:i:s', strtotime($ts)) : ''; }
 }
 function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
+function format_ips($ipString){
+  $ips = array_filter(array_map('trim', explode(',', (string)$ipString)));
+  return implode('<br>', array_map('h', $ips));
+}
 
 /* 자산 이력 렌더링 */
 function render_history($text) {
@@ -50,8 +54,8 @@ function render_history($text) {
 $assetId   = (int)($asset['asset_id'] ?? 0);
 $isDeleted = (($asset['del_yn'] ?? 'N') === 'Y');
 
-$createdBy = isset($asset['created_ip']) ? ip_to_user($asset['created_ip']) : '';
-$updatedBy = isset($asset['updated_ip']) ? ip_to_user($asset['updated_ip']) : '';
+$createdBy = $asset['created_user'] ?? ip_to_user($asset['created_ip'] ?? '');
+$updatedBy = $asset['updated_user'] ?? ip_to_user($asset['updated_ip'] ?? '');
 
 if ($assetId <= 0) {
   http_response_code(404);
@@ -120,18 +124,18 @@ $barcodeUrl = '/ezk/barcode/barcode_generator.php?barcode=' . rawurlencode($barc
         <div class="detail-val"><?= h(trim(($asset['rack_location'] ?? '').' '.($asset['mounted_location'] ?? ''))) ?></div>
       </div>
 
-      <div class="field">
-        <label class="label">호스트명</label>
-        <div class="detail-val"><?= h($asset['hostname'] ?? '') ?></div>
+        <div class="field">
+          <label class="label">호스트명</label>
+          <div class="detail-val"><?= h($asset['hostname'] ?? '') ?></div>
+        </div>
+
+        <div class="field">
+          <label class="label">IP</label>
+          <div class="detail-val"><?= format_ips($asset['ip'] ?? '') ?></div>
+        </div>
       </div>
 
-      <div class="field">
-        <label class="label">IP</label>
-        <div class="detail-val"><?= h($asset['ip'] ?? '') ?></div>
-      </div>
-    </div>
-
-    <!-- 2행: 종류 | 제조사 | 모델명 | S/N | 입고년월 -->
+      <!-- 2행: 종류 | 제조사 | 모델명 | S/N | 입고년월 -->
     <div class="form-grid grid-5" style="margin-top:10px;">
       <div class="field">
         <label class="label">종류</label>

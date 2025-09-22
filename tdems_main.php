@@ -11,6 +11,11 @@ function h($s)
 {
   return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
 }
+function format_ips($ipString)
+{
+  $ips = array_filter(array_map('trim', explode(',', (string)$ipString)));
+  return implode('<br>', array_map('h', $ips));
+}
 function val($arr, $k, $d = '')
 {
   return isset($arr[$k]) ? $arr[$k] : $d;
@@ -200,7 +205,7 @@ function sort_link($field, $label)
                     <?php endif; ?>
                   </td>
                   <td><a href="<?= h($detailUrl) ?>"><?= h($row['hostname'] ?? '') ?></a></td>
-                  <td><?= h($row['ip'] ?? '') ?></td>
+                    <td><?= format_ips($row['ip'] ?? '') ?></td>
                   <td><?= h($row['asset_type'] ?? '') ?></td>
                   <td><?= h($row['manufacturer'] ?? '') ?></td>
                   <td><?= h($row['model_name'] ?? '') ?></td>

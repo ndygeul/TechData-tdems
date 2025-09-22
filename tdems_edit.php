@@ -13,6 +13,7 @@ if (!function_exists('fmt_dt')) {
 
 $assetId   = (int)($asset['asset_id'] ?? 0);
 $isDeleted = (($asset['del_yn'] ?? 'N') === 'Y');
+$ips       = array_filter(array_map('trim', explode(',', $asset['ip'] ?? '')));
 ?>
 <!DOCTYPE html>
 <html lang="ko">
@@ -70,11 +71,30 @@ $isDeleted = (($asset['del_yn'] ?? 'N') === 'Y');
 
         <div class="field">
           <label class="label">IP <span class="label-sub">(빈 값 허용 • IPv4만 허용)</span></label>
-          <input class="input" type="text" name="ip"
-                 placeholder="예: 10.1.23.45"
-                 title="IPv4 형식만 허용 (예: 10.1.23.45)"
-                 inputmode="numeric" maxlength="15"
-                 value="<?= htmlspecialchars($asset['ip'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+          <div id="ipFields">
+            <?php if (!empty($ips)): ?>
+              <?php foreach ($ips as $ipAddr): ?>
+                <div class="ip-item">
+                  <input class="input" type="text" name="ip[]"
+                         placeholder="예: 10.1.23.45"
+                         title="IPv4 형식만 허용 (예: 10.1.23.45)"
+                         inputmode="numeric" maxlength="15"
+                         value="<?= htmlspecialchars($ipAddr, ENT_QUOTES, 'UTF-8') ?>">
+                  <button type="button" class="btn xs ghost ip-add">+추가</button>
+                  <button type="button" class="btn xs ghost ip-remove">-삭제</button>
+                </div>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <div class="ip-item">
+                <input class="input" type="text" name="ip[]"
+                       placeholder="예: 10.1.23.45"
+                       title="IPv4 형식만 허용 (예: 10.1.23.45)"
+                       inputmode="numeric" maxlength="15">
+                <button type="button" class="btn xs ghost ip-add">+추가</button>
+                <button type="button" class="btn xs ghost ip-remove">-삭제</button>
+              </div>
+            <?php endif; ?>
+          </div>
         </div>
       </div>
 
@@ -199,8 +219,22 @@ $isDeleted = (($asset['del_yn'] ?? 'N') === 'Y');
           <div id="ssdFields">
             <?php if (!empty($asset_ssds)): ?>
               <?php foreach ($asset_ssds as $s): ?>
+                <?php
+                  $capRaw = $s['capacity'] ?? '';
+                  $unit = 'GB';
+                  if (preg_match('/(TB|GB)$/i', $capRaw, $m)) {
+                    $unit = strtoupper($m[1]);
+                    $capVal = substr($capRaw, 0, -strlen($unit));
+                  } else {
+                    $capVal = $capRaw;
+                  }
+                ?>
                 <div class="ssd-item">
-                  <input class="input" type="text" name="ssd_capacity[]" value="<?= htmlspecialchars($s['capacity'], ENT_QUOTES, 'UTF-8') ?>" placeholder="개별 용량">
+                  <input class="input" type="number" name="ssd_capacity[]" value="<?= htmlspecialchars($capVal, ENT_QUOTES, 'UTF-8') ?>" placeholder="개별 용량" min="0" step="0.01">
+                  <select class="select" name="ssd_unit[]">
+                    <option value="GB" <?= $unit === 'GB' ? 'selected' : '' ?>>GB</option>
+                    <option value="TB" <?= $unit === 'TB' ? 'selected' : '' ?>>TB</option>
+                  </select>
                   <input class="input" type="number" name="ssd_qty[]" value="<?= (int)$s['quantity'] ?>" placeholder="수량" min="1">
                   <button type="button" class="btn xs ghost ssd-add">+추가</button>
                   <button type="button" class="btn xs ghost ssd-remove">-삭제</button>
@@ -208,7 +242,11 @@ $isDeleted = (($asset['del_yn'] ?? 'N') === 'Y');
               <?php endforeach; ?>
             <?php else: ?>
               <div class="ssd-item">
-                <input class="input" type="text" name="ssd_capacity[]" placeholder="개별 용량">
+                <input class="input" type="number" name="ssd_capacity[]" placeholder="개별 용량" min="0" step="0.01">
+                <select class="select" name="ssd_unit[]">
+                  <option value="GB">GB</option>
+                  <option value="TB">TB</option>
+                </select>
                 <input class="input" type="number" name="ssd_qty[]" placeholder="수량" min="1">
                 <button type="button" class="btn xs ghost ssd-add">+추가</button>
                 <button type="button" class="btn xs ghost ssd-remove">-삭제</button>
@@ -221,8 +259,22 @@ $isDeleted = (($asset['del_yn'] ?? 'N') === 'Y');
           <div id="hddFields">
             <?php if (!empty($asset_hdds)): ?>
               <?php foreach ($asset_hdds as $h): ?>
+                <?php
+                  $capRaw = $h['capacity'] ?? '';
+                  $unit = 'GB';
+                  if (preg_match('/(TB|GB)$/i', $capRaw, $m)) {
+                    $unit = strtoupper($m[1]);
+                    $capVal = substr($capRaw, 0, -strlen($unit));
+                  } else {
+                    $capVal = $capRaw;
+                  }
+                ?>
                 <div class="hdd-item">
-                  <input class="input" type="text" name="hdd_capacity[]" value="<?= htmlspecialchars($h['capacity'], ENT_QUOTES, 'UTF-8') ?>" placeholder="개별 용량">
+                  <input class="input" type="number" name="hdd_capacity[]" value="<?= htmlspecialchars($capVal, ENT_QUOTES, 'UTF-8') ?>" placeholder="개별 용량" min="0" step="0.01">
+                  <select class="select" name="hdd_unit[]">
+                    <option value="GB" <?= $unit === 'GB' ? 'selected' : '' ?>>GB</option>
+                    <option value="TB" <?= $unit === 'TB' ? 'selected' : '' ?>>TB</option>
+                  </select>
                   <input class="input" type="number" name="hdd_qty[]" value="<?= (int)$h['quantity'] ?>" placeholder="수량" min="1">
                   <button type="button" class="btn xs ghost hdd-add">+추가</button>
                   <button type="button" class="btn xs ghost hdd-remove">-삭제</button>
@@ -230,7 +282,11 @@ $isDeleted = (($asset['del_yn'] ?? 'N') === 'Y');
               <?php endforeach; ?>
             <?php else: ?>
               <div class="hdd-item">
-                <input class="input" type="text" name="hdd_capacity[]" placeholder="개별 용량">
+                <input class="input" type="number" name="hdd_capacity[]" placeholder="개별 용량" min="0" step="0.01">
+                <select class="select" name="hdd_unit[]">
+                  <option value="GB">GB</option>
+                  <option value="TB">TB</option>
+                </select>
                 <input class="input" type="number" name="hdd_qty[]" placeholder="수량" min="1">
                 <button type="button" class="btn xs ghost hdd-add">+추가</button>
                 <button type="button" class="btn xs ghost hdd-remove">-삭제</button>

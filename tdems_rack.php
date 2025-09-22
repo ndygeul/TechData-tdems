@@ -11,6 +11,10 @@ if (!$mysqli instanceof mysqli) {
 
 function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
+function split_ips($ipString) {
+  return array_filter(array_map('trim', explode(',', (string)$ipString)));
+}
+
 $rack = trim($_GET['rack'] ?? '');
 $assetId = (int)($_GET['id'] ?? 0);
 
@@ -41,15 +45,20 @@ function loadRackAssets(mysqli $mysqli, string $rack): array {
   $assets = [];
   while ($row = $res->fetch_assoc()) {
     $loc = strtoupper(trim($row['mounted_location'] ?? ''));
+    $ranges = [];
     if ($loc === 'ALL') {
-      $bottom = 1;
-      $top = 42;
-    } elseif (preg_match('/^(\d{2})(?:-(\d{2}))?$/', $loc, $m)) {
-      $start = (int)$m[1];
-      $end = isset($m[2]) ? (int)$m[2] : $start;
-      $bottom = min($start, $end);
-      $top = max($start, $end);
+      $ranges[] = [1, 42];
     } else {
+      foreach (explode(',', $loc) as $seg) {
+        $seg = trim($seg);
+        if (preg_match('/^(\d{2})(?:-(\d{2}))?$/', $seg, $m)) {
+          $start = (int)$m[1];
+          $end   = isset($m[2]) ? (int)$m[2] : $start;
+          $ranges[] = [min($start, $end), max($start, $end)];
+        }
+      }
+    }
+    if (!$ranges) {
       continue;
     }
 
@@ -58,7 +67,11 @@ function loadRackAssets(mysqli $mysqli, string $rack): array {
     if (!empty($row['equip_barcode'])) $parts[] = '설비바코드: ' . $row['equip_barcode'];
     $parts[] = '랙/장착: ' . $row['rack_location'] . ' ' . $row['mounted_location'];
     if (!empty($row['hostname']))      $parts[] = '호스트명: '   . $row['hostname'];
-    if (!empty($row['ip']))            $parts[] = 'IP: '         . $row['ip'];
+    if (!empty($row['ip'])) {
+      foreach (split_ips($row['ip']) as $ip) {
+        $parts[] = 'IP: ' . $ip;
+      }
+    }
     if (!empty($row['asset_type']))    $parts[] = '종류: '       . $row['asset_type'];
     if (!empty($row['manufacturer']))  $parts[] = '제조사: '     . $row['manufacturer'];
     if (!empty($row['model_name']))    $parts[] = '모델명: '     . $row['model_name'];
@@ -127,10 +140,13 @@ function loadRackAssets(mysqli $mysqli, string $rack): array {
 
     $row['tooltip'] = implode("\n", $parts);
 
-    $row['rowspan'] = $top - $bottom + 1;
-    $assets[$top] = $row;
-    for ($u = $bottom; $u < $top; $u++) {
-      $assets[$u] = false;
+    foreach ($ranges as [$bottom, $top]) {
+      $rowCopy = $row;
+      $rowCopy['rowspan'] = $top - $bottom + 1;
+      $assets[$top] = $rowCopy;
+      for ($u = $bottom; $u < $top; $u++) {
+        $assets[$u] = false;
+      }
     }
   }
   $stmt->close();
