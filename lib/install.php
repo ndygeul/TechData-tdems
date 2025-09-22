@@ -5,6 +5,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $hostInput = trim($_POST['server'] ?? '');
+$portInput = trim($_POST['port'] ?? '');
 $userInput = trim($_POST['id'] ?? '');
 $passInput = trim($_POST['pw'] ?? '');
 $dbInput   = trim($_POST['db'] ?? '');
@@ -13,12 +14,13 @@ $configPath = __DIR__ . '/../config/db.php';
 
 $config = "<?php\n".
           "\$host = \"{$hostInput}\";\n".
+          "\$port = \"{$portInput}\";\n".
           "\$user = \"{$userInput}\";\n".
           "\$pass = \"{$passInput}\";\n".
           "\$dbname = \"{$dbInput}\";\n\n".
           "\$conn = null;\n".
           "if (\$host !== '' && \$user !== '' && \$dbname !== '') {\n".
-          "    \$conn = @new mysqli(\$host, \$user, \$pass, \$dbname);\n".
+          "    \$conn = @new mysqli(\$host, \$user, \$pass, \$dbname, \$port);\n".
           "    if (\$conn->connect_error) {\n".
           "        \$conn = null;\n".
           "    } else {\n".
@@ -28,7 +30,7 @@ $config = "<?php\n".
 file_put_contents($configPath, $config);
 
 require $configPath;
-if ($host !== $hostInput || $user !== $userInput || $pass !== $passInput || $dbname !== $dbInput) {
+if ($host !== $hostInput || $port !== $portInput || $user !== $userInput || $pass !== $passInput || $dbname !== $dbInput) {
     header('Location: ../tdems_installation.php?msg=' . urlencode('설정 저장 실패'));
     exit;
 }
